@@ -27,16 +27,18 @@ class Minimax:
         Initializes the Minimax class
         """
         self.game = GameLogic
-        self.game_tree = None
+        self.game_tree = GameTree()
+        self.computer_player = MIN
 
-    def play(self, state: List[int], max_moves: int = 6, player="max"):
+
+    def play(self, state: List[int], iterations: int = 4, player="max"):
         """
         Determines the winner of the game
         """
         self.state = state
         self.game_tree = GameTree(state)
         dif, _ = self.max_value(state, -float('inf'),
-                                float('inf'), 0, tree_level=0, max_moves=max_moves)
+                                float('inf'), depth=0, iterations=iterations)
         if dif > 0:
             return "Max"
         elif dif < 0:
@@ -44,7 +46,7 @@ class Minimax:
         else:
             return "Tie"
 
-    def ply(self, state: List[int] = None, player="max", max_moves: int = 8) -> (int, int):
+    def get_ply_successors(self, state: List[int] = None, player=MIN, iterations: int = 4) -> (int, int):
         """
         Returns the computer's move based on the current state
         return computer optimal move
@@ -53,107 +55,110 @@ class Minimax:
         if state is None:
             state = self.game.state.copy()
         # check if the game is over
-
-        # try to find best move in the stored tree first
-        if self.game_tree is not None:
-            # look for matching state in the tree where the state is the same and the player is -1
-            for node in self.game_tree.G.nodes:
-                if self.game_tree.G.nodes[node]['state'] == state and self.game_tree.G.nodes[node]['player'] == -1:
-                    # return the best move
-                    # get the action based on the node parent
-                    action = list(self.game_tree.G.predecessors(node))[0]
-                    # find the action based on difference between the states
-                    action = [i for i in range(len(state)) if state[i] != self.game_tree.G.nodes[action]['state'][i]][0]
-                    return self.game_tree.G.nodes[node]['value'], action
-
-        self.game_tree = GameTree(state)
         if self.game.check_winner(state) in ["X", "O"]:
-            print(
-                f'game is already over, returning {self.game.utility(state, 0)} and 0')
             return self.game.utility(state, 0), 0
-        if player == "max":
-            v, a = self.max_value(state, -inf, inf, 0,
-                                  tree_level=0, max_moves=max_moves)
-        else:
-            v, a = self.min_value(state, -inf, inf, 0,
-                                  tree_level=0, max_moves=max_moves)
-        print(f'returning {v} and {a} for player {player}')
+        # if the game is not over, get the best move
+        if sum(state) == 0:
+            self.computer_player = MAX
+        v, a = self.minimax_decision(
+            state, self.computer_player, iterations=iterations)
         return v, a
 
-    def max_value(self, state: List[int], alpha: int, beta: int, dif: int, tree_level: int, max_moves: int) -> (int, int):
+    def minimax_decision(self, state: List[int], player: str, depth:int = None, iterations: int = 4) -> (int, int):
+        """
+        Returns the best move for the computer
+        """
+        if depth is None:
+            # cals how many moves based on the state
+            depth = 0
+            for i in state:
+                if i != 0:
+                    depth += 1
+            depth -= 1
+        if player == MIN:
+            v, a = self.max_value(state, -float('inf'),
+                                  float('inf'), depth, iterations)
+        else:
+            v, a = self.min_value(state, -float('inf'),
+                                  float('inf'), depth, iterations)
+        print(v, a)
+        return v, a
+
+    def max_value(self, state: List[int], alpha: int, beta: int, depth: int, iterations: int = 4) -> (int, int):
         """
         Returns the maximum value and the action that leads to that value
         """
-
-        packed_state = [tree_level, tuple(state), MAX]
+        print("in max with state", state)
+        ply = [depth, tuple(state), MAX]
         if self.game.is_terminal(state, MAX):
-            print("hi")
             utility = self.game.utility(state, MAX)
-            print(packed_state)
-            self.game_tree.update_node_value(packed_state, utility)
-            return utility, -1
+            self.game_tree.update_node_value(ply, utility)
+            # -1 for no move
+            return utility, None
 
-        move = -1
-        v = -inf
+        best_move = None
+        v = -inf # initial value of max node
         for a in self.game.actions(state):
-            new_state, score = self.game.result(state, a)
-            packed_successor = [tree_level + 1, tuple(new_state), MIN]
-            self.game_tree.add_node(packed_successor)
-            self.game_tree.add_edge(packed_state, packed_successor)
+            # TODO: implemet killer move heuristic
+            new_state = self.game.result(state, a)
+            next_ply = [depth + 1, tuple(new_state), MIN]
+            self.game_tree.add_node(next_ply)
+            self.game_tree.add_edge(ply, next_ply)
             v2, a2 = self.min_value(
-                new_state, alpha, beta, dif + score, tree_level + 1, max_moves - 1)
-            if v < v2:
+                new_state, alpha, beta, depth + 1, iterations - 1)
+            if v <= v2:
                 v = v2
-                if a2 != 0:
-                    move = a2
+                # should not get -1 as a move
+                if a2 is not None:
+                    best_move = a2
                 else:
-                    move = a
+                    best_move = a
             alpha = max(alpha, v2)
             if beta <= v:
-                print("pruning")
                 # to later display the pruned nodes
-                self.game_tree.update_node_value(packed_successor, inf)
+                self.game_tree.update_node_value(next_ply, inf)
                 break
-        print("returning from max_value")
-        # self.game_tree.update_node_value(packed_state, v)
-        # self.game_tree.update_node_state(packed_state, state)
-        return v, move
+        # updating best move and value wile backtracking
+        self.game_tree.update_node_value(ply, v)
+        self.game_tree.update_node_best_move(ply, best_move)
+        return v, best_move
 
-    def min_value(self, state: List[int], alpha: int, beta: int, dif: int, tree_level: int, max_moves: int) -> (int, int):
+    def min_value(self, state: List[int], alpha: int, beta: int, depth: int, iterations: int = 4) -> (int, int):
         """
         Returns the minimum value and the action that leads to that value
         """
-        packed_state = [tree_level, tuple(state), MIN]
-        if self.game.is_terminal(state, MIN):
-            utility = self.game.utility(state, MIN)
-            self.game_tree.update_node_value(packed_state, utility)
-            return utility, -1
-
         v = inf
-        move = -1
-        for a in self.game.actions(state):
-            new_state, score = self.game.result(state, a)
-            # Adjusted key to include newState and updated dif
-            packed_successor = [tree_level + 1, tuple(new_state), MAX]
-            self.game_tree.add_node(packed_successor)
-            self.game_tree.add_edge(packed_state, packed_successor)
-            v2, a2 = self.max_value(
-                new_state, alpha, beta, dif - score, tree_level + 1, max_moves-1)
-            if v > v2:
-                if a2 != 0:
-                    move = a2
-                else:
-                    move = a
-                v = v2
-            beta = min(beta, v2)
-            if v <= alpha:
-                # to later display the pruned nodes
-                self.game_tree.update_node_value(packed_successor, -inf)
-                break
+        best_move = None
+        ply = [depth, tuple(state), MIN]
+        print("in min with state", state)
+
+        if self.game.is_terminal(state, MIN):
+            v = self.game.utility(state, MIN)
+        else:
+            for a in self.game.actions(state):
+                new_state = self.game.result(state, a)
+                # Adjusted key to include newState and updated dif
+                next_ply = [depth + 1, tuple(new_state), MAX]
+                self.game_tree.add_node(next_ply)
+                self.game_tree.add_edge(ply, next_ply)
+                v2, a2 = self.max_value(
+                    new_state, alpha, beta, depth + 1, iterations-1)
+                if v >= v2:
+                    if a2 is not None:
+                        best_move = a2
+                    else:
+                        best_move = a
+                    v = v2
+                beta = min(beta, v2)
+                if v <= alpha:
+                    # to later display the pruned nodes
+                    # add to the tree dummy node with value -inf
+                    self.game_tree.update_node_value(next_ply, -inf)
+                    break
         # update node_id to be the return value
-        # self.game_tree.update_node_value(packed_state, v)
-        # self.game_tree.update_node_state(packed_state, state)
-        return v, move
+        self.game_tree.update_node_value(ply, v)
+        self.game_tree.update_node_best_move(ply, best_move)
+        return v, best_move
 
 
 if __name__ == "__main__":

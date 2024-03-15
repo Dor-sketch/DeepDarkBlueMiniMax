@@ -16,9 +16,9 @@ class GameGUI:
     StoneGameGUI class
     """
 
-    def __init__(self, root, game_logic):
+    def __init__(self, root, minimax):
         self.root = root
-        self.game_logic = game_logic
+        self.minimax = minimax
         self.root.title("My Game")
         self.root.geometry("400x400")
         self.canvas = tk.Canvas(self.root, width=300,
@@ -33,8 +33,10 @@ class GameGUI:
             self.frame, text="Reset Game", command=self.reset_game)
         self.change_game_button = tk.Button(
             self.frame, text="Change Game", command=self.change_game)
+        # self.computer_start_button = tk.Button(
+        #     self.frame, text="Computer Start", command=self.computer_turn)
 
-        self.original_stones = self.game_logic.game.state.copy()
+        self.original_stones = self.minimax.game.state.copy()
         self.state = []
         self.player_stones = []
         self.computer_stones = []
@@ -49,7 +51,7 @@ class GameGUI:
         Initialize the labels
         """
         self.label = tk.Label(
-            self.frame, text=self.game_logic.game.rules, fg='black')
+            self.frame, text=self.minimax.game.rules, fg='black')
         self.status_label = tk.Label(
             self.root, text="")
         self.score_label = tk.Label(
@@ -62,22 +64,23 @@ class GameGUI:
         self.score_label.grid(row=4, column=0)
         self.canvas.grid(row=5, column=0)
         self.change_game_button.grid(row=2, column=1)
+        # self.computer_start_button.grid(row=2, column=2)
 
     def change_game(self):
         """
         Change the game
         """
-        if isinstance(self.game_logic.game, StoneGame):
-            self.game_logic = Minimax(TicTacToe())
+        if isinstance(self.minimax.game, StoneGame):
+            self.minimax = Minimax(TicTacToe())
             self.root.destroy()
             root = tk.Tk()
-            game = TicTacToeGUI(root, self.game_logic)
+            game = TicTacToeGUI(root, self.minimax)
             root.mainloop()
         else:
-            self.game_logic = Minimax(StoneGame())
+            self.minimax = Minimax(StoneGame())
             self.root.destroy()
             root = tk.Tk()
-            game = StoneGameGUI(root, self.game_logic)
+            game = StoneGameGUI(root, self.minimax)
             root.mainloop()
 
     def set_styling(self):
@@ -97,11 +100,11 @@ class GameGUI:
         """
         Make the tree
         """
-        self.game_logic.game_tree.plot_mini_max_tree(label_type="state")
+        self.minimax.game_tree.plot_mini_max_tree(label_type="state")
 
     def reset_game(self):
-        self.game_logic.game.reset()
-        self.game_logic.game.state = self.original_stones.copy()
+        self.minimax.game.reset()
+        self.minimax.game.state = self.original_stones.copy()
         self.update_status()
 
     def pile_click(self, event, index):
@@ -114,13 +117,13 @@ class GameGUI:
             self.take_stones(i + 1)
 
     def update_status(self):
-        status = f"Remaining Stones: {self.game_logic.game.state}"
+        status = f"Remaining Stones: {self.minimax.game.state}"
         self.status_label.config(text=status)
         self.score_label.config(
             text=f"Player: {self.player_score} Computer: {self.computer_score}")
         self.canvas.delete("all")
         self.piles = []
-        for i in range(len(self.game_logic.game.state)):
+        for i in range(len(self.minimax.game.state)):
             self.piles.append(
                 self.canvas.create_rectangle(50 * i, 0, 50 * (i + 1), 50,
                                              fill='orange',
@@ -129,7 +132,7 @@ class GameGUI:
             self.canvas.tag_bind(self.piles[i], '<Button-1>',
                                  lambda event, index=i: self.pile_click(event, index), add='+')
             self.canvas.create_text(
-                50 * i + 25, 25, text=str(self.game_logic.game.state[i]), font=("Arial", 14))
+                50 * i + 25, 25, text=str(self.minimax.game.state[i]), font=("Arial", 14))
 
         for i in range(len(self.player_stones)):
             self.canvas.create_rectangle(
@@ -146,7 +149,7 @@ class GameGUI:
                 50 * i + 25, 125, text=str(self.computer_stones[i]),
                 font=("Arial", 14))
 
-        if len(self.game_logic.game.state) == 0:
+        if len(self.minimax.game.state) == 0:
             self.results()
 
     def take_stones(self, stone_index=None):
@@ -159,13 +162,13 @@ class GameGUI:
         else:
             raise ValueError("Please select a valid pile.")
         for i in range(num_stones):
-            stone = self.game_logic.game.state[i]
+            stone = self.minimax.game.state[i]
             self.player_stones.append(stone)
         for i in range(num_stones):
-            self.player_score += self.game_logic.game.state[i]
-        newState, _ = self.game_logic.result(
-            self.game_logic.game.state, num_stones)
-        self.game_logic.game.state = newState
+            self.player_score += self.minimax.game.state[i]
+        newState, _ = self.minimax.result(
+            self.minimax.game.state, num_stones)
+        self.minimax.game.state = newState
         self.update_status()
         self.computer_turn()
 
@@ -173,13 +176,13 @@ class GameGUI:
         """
         Computer's turn
         """
-        _, action = self.game_logic.ply(self.game_logic.game.state.copy())
+        _, action = self.minimax.ply(self.minimax.game.state.copy())
         for i in range(action):
-            self.computer_score += self.game_logic.game.state[i]
-            self.computer_stones.append(self.game_logic.game.state[i])
-        newState, _ = self.game_logic.result(
-            self.game_logic.game.state, action)
-        self.game_logic.game.state = newState
+            self.computer_score += self.minimax.game.state[i]
+            self.computer_stones.append(self.minimax.game.state[i])
+        newState, _ = self.minimax.result(
+            self.minimax.game.state, action)
+        self.minimax.game.state = newState
         self.update_status()
 
     def results(self):
@@ -209,10 +212,11 @@ class TicTacToeGUI(GameGUI):
     TicTacToeGUI class
     """
 
-    def __init__(self, root, game_logic):
-        super().__init__(root, game_logic)
+    def __init__(self, root, minimax):
+        super().__init__(root, minimax)
         self.root.title("Tic Tac Toe")
         self.canvas.bind("<Button-1>", self.click)
+        self.computer_player = -1
 
     def click(self, event):
         """
@@ -220,12 +224,12 @@ class TicTacToeGUI(GameGUI):
         """
         x, y = event.x, event.y
         row, col = x // 100, y // 100
-        if self.game_logic.game.state[row * 3 + col] != 0:
+        if self.minimax.game.state[row * 3 + col] != 0:
             return
 
-        self.game_logic.game.state[row * 3 + col] = 1
+        self.minimax.game.state[row * 3 + col] = - self.computer_player
         print(f'Player takes action {row * 3 + col}')
-        print(self.game_logic.game.state)
+        print(self.minimax.game.state)
         self.update_status()
         self.computer_turn()
 
@@ -238,10 +242,10 @@ class TicTacToeGUI(GameGUI):
             for j in range(3):
                 x1, y1 = i * 100, j * 100
                 x2, y2 = (i + 1) * 100, (j + 1) * 100
-                if self.game_logic.game.state[i * 3 + j] == 1:
+                if self.minimax.game.state[i * 3 + j] == -1:
                     self.canvas.create_oval(
                         x1, y1, x2, y2, outline="black", width=2)
-                elif self.game_logic.game.state[i * 3 + j] == -1:
+                elif self.minimax.game.state[i * 3 + j] == 1:
                     self.canvas.create_line(
                         x1, y1, x2, y2, fill="black", width=2)
                     self.canvas.create_line(
@@ -252,35 +256,47 @@ class TicTacToeGUI(GameGUI):
         self.canvas.create_line(0, 100, 300, 100, fill="black", width=2)
         self.canvas.create_line(0, 200, 300, 200, fill="black", width=2)
 
-        print(f'current state: {self.game_logic.game.state}')
-        print(f'check winner: {self.game_logic.game.is_terminal()}')
-        status = self.game_logic.game.is_terminal(self.game_logic.game.state)
-        if status == "Player":
-            messagebox.showinfo("Results", "You win!")
-            self.reset_game()
-            return
-
-        elif status == "Computer":
-            messagebox.showinfo("Results", "You lose!")
-            self.reset_game()
-            return
-
-        elif status == "Tie":
-            messagebox.showinfo("Results", "It's a tie!")
-            self.reset_game()
-            return
+        print(f'current state: {self.minimax.game.state}')
+        print(f'check winner: {self.minimax.game.is_terminal()}')
+        if self.minimax.game.is_terminal(self.minimax.game.state):
+            self.results()
 
     def computer_turn(self):
         """
         Computer's turn
         """
-        _, action = self.game_logic.ply(self.game_logic.game.state.copy())
+        if sum(self.minimax.game.state) == 0:
+            self.computer_player = 1
+        elif sum(self.minimax.game.state) == 1:
+            self.computer_player = -1
+        _, action = self.minimax.get_ply_successors(
+            self.minimax.game.state.copy())
         print(f'Computer takes action {action}')
-        if self.game_logic.game.state[action] != 0:
-            action = random.choice(
-                self.game_logic.actions(self.game_logic.game.state))
-        self.game_logic.game.state[action] = -1
+        if action is None:
+            # computer won!
+            print("Computer won!")
+        self.minimax.game.state[action] = self.computer_player
         self.update_status()
+
+    def results(self):
+        """
+        Display the results of the game based on the utility
+        """
+        utility = self.minimax.game.utility(self.minimax.game.state, 1)
+        if utility == 1:
+            messagebox.showinfo("Results", "You win!")
+        elif utility == -1:
+            messagebox.showinfo("Results", "You lose!")
+        else:
+            messagebox.showinfo("Results", "It's a tie!")
+        # ask to play again
+        play_again = messagebox.askyesno(
+            "Play Again", "Do you want to play again?")
+        if play_again:
+            self.reset_game()
+            self.root.mainloop()
+        else:
+            self.root.destroy()
 
 
 class StoneGameGUI(GameGUI):
@@ -288,8 +304,8 @@ class StoneGameGUI(GameGUI):
     StoneGameGUI class
     """
 
-    def __init__(self, root, game_logic):
-        super().__init__(root, game_logic)
+    def __init__(self, root, minimax):
+        super().__init__(root, minimax)
         self.root.title("Stone Game")
         self.canvas.bind("<Button-1>", self.click)
 
@@ -306,5 +322,5 @@ class StoneGameGUI(GameGUI):
         self.piles = []
         self.player_score = 0
         self.computer_score = 0
-        self.game_logic.reset()
+        self.minimax.reset()
         return super().reset_game()

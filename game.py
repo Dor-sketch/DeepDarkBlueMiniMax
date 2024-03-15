@@ -40,10 +40,22 @@ class GameLogic:
         """
         pass
 
-
+    def __str__ (self):
+        """
+        return pretty print of the game state
+        """
+        ret = ""
+        for i, s in enumerate(self.state):
+            ret += str(s)
+            if i % 3 == 2:
+                ret += "\n"
+            else:
+                ret += " "
+        return ret
 
     def __type__(self):
         """
         return the type of the game
         """
         pass
+        

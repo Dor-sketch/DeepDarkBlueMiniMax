@@ -34,7 +34,7 @@ class TicTacToe(GameLogic):
         Generates a list of possible actions based on the current state
         """
         # if there is already a winner, return empty list
-        if self.check_winner(state) in [MAX_PLAYER, MIN_PLAYER]:
+        if self.is_terminal(state):
             return []
         return [i for i in range(len(state)) if state[i] == 0]
 
@@ -63,7 +63,7 @@ class TicTacToe(GameLogic):
             new_state[action] = -1
         else:
             new_state[action] = 1
-        return new_state, 0
+        return new_state
 
     def reset(self):
         """
@@ -82,6 +82,7 @@ class TicTacToe(GameLogic):
         if 0 not in state:
             return True
         # check if there is a winner
+        print(state)
         for player in [1, -1]:
             for combo in GOAL_STATES:
                 if all(state[i] == player for i in combo):
