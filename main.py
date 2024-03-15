@@ -4,7 +4,7 @@ Player can choose to switch to the stone game from the GUI.
 """
 import tkinter as tk
 from gui import TicTacToeGUI
-from game import TicTacToe
+from game_tic_tac_toe import TicTacToe
 from minimax import Minimax
 
 

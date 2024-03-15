@@ -7,7 +7,8 @@ from tkinter import messagebox
 import tkinter as tk
 from minimax import Minimax
 from game_tree import GameTree
-from game import StoneGame, TicTacToe
+from game_tic_tac_toe import TicTacToe
+from game_stone_game import StoneGame
 
 
 class GameGUI:
@@ -33,7 +34,7 @@ class GameGUI:
         self.change_game_button = tk.Button(
             self.frame, text="Change Game", command=self.change_game)
 
-        self.original_stones = self.game_logic.state.copy()
+        self.original_stones = self.game_logic.game.state.copy()
         self.state = []
         self.player_stones = []
         self.computer_stones = []
@@ -48,7 +49,7 @@ class GameGUI:
         Initialize the labels
         """
         self.label = tk.Label(
-            self.frame, text=self.game_logic.rules, fg='black')
+            self.frame, text=self.game_logic.game.rules, fg='black')
         self.status_label = tk.Label(
             self.root, text="")
         self.score_label = tk.Label(
@@ -96,14 +97,11 @@ class GameGUI:
         """
         Make the tree
         """
-        self.game_logic.play(self.original_stones)
-        print(self.game_logic.G)
-        game_tree = GameTree(self.game_logic.G)
-        game_tree.plot_mini_max_tree()
+        self.game_logic.game_tree.plot_mini_max_tree(label_type="state")
 
     def reset_game(self):
-        self.game_logic.reset()
-        self.game_logic.state = self.original_stones.copy()
+        self.game_logic.game.reset()
+        self.game_logic.game.state = self.original_stones.copy()
         self.update_status()
 
     def pile_click(self, event, index):
@@ -116,13 +114,13 @@ class GameGUI:
             self.take_stones(i + 1)
 
     def update_status(self):
-        status = f"Remaining Stones: {self.game_logic.state}"
+        status = f"Remaining Stones: {self.game_logic.game.state}"
         self.status_label.config(text=status)
         self.score_label.config(
             text=f"Player: {self.player_score} Computer: {self.computer_score}")
         self.canvas.delete("all")
         self.piles = []
-        for i in range(len(self.game_logic.state)):
+        for i in range(len(self.game_logic.game.state)):
             self.piles.append(
                 self.canvas.create_rectangle(50 * i, 0, 50 * (i + 1), 50,
                                              fill='orange',
@@ -131,7 +129,7 @@ class GameGUI:
             self.canvas.tag_bind(self.piles[i], '<Button-1>',
                                  lambda event, index=i: self.pile_click(event, index), add='+')
             self.canvas.create_text(
-                50 * i + 25, 25, text=str(self.game_logic.state[i]), font=("Arial", 14))
+                50 * i + 25, 25, text=str(self.game_logic.game.state[i]), font=("Arial", 14))
 
         for i in range(len(self.player_stones)):
             self.canvas.create_rectangle(
@@ -148,7 +146,7 @@ class GameGUI:
                 50 * i + 25, 125, text=str(self.computer_stones[i]),
                 font=("Arial", 14))
 
-        if len(self.game_logic.state) == 0:
+        if len(self.game_logic.game.state) == 0:
             self.results()
 
     def take_stones(self, stone_index=None):
@@ -161,13 +159,13 @@ class GameGUI:
         else:
             raise ValueError("Please select a valid pile.")
         for i in range(num_stones):
-            stone = self.game_logic.state[i]
+            stone = self.game_logic.game.state[i]
             self.player_stones.append(stone)
         for i in range(num_stones):
-            self.player_score += self.game_logic.state[i]
+            self.player_score += self.game_logic.game.state[i]
         newState, _ = self.game_logic.result(
-            self.game_logic.state, num_stones)
-        self.game_logic.state = newState
+            self.game_logic.game.state, num_stones)
+        self.game_logic.game.state = newState
         self.update_status()
         self.computer_turn()
 
@@ -175,13 +173,13 @@ class GameGUI:
         """
         Computer's turn
         """
-        _, action = self.game_logic.ply(self.game_logic.state.copy())
+        _, action = self.game_logic.ply(self.game_logic.game.state.copy())
         for i in range(action):
-            self.computer_score += self.game_logic.state[i]
-            self.computer_stones.append(self.game_logic.state[i])
+            self.computer_score += self.game_logic.game.state[i]
+            self.computer_stones.append(self.game_logic.game.state[i])
         newState, _ = self.game_logic.result(
-            self.game_logic.state, action)
-        self.game_logic.state = newState
+            self.game_logic.game.state, action)
+        self.game_logic.game.state = newState
         self.update_status()
 
     def results(self):
@@ -222,12 +220,12 @@ class TicTacToeGUI(GameGUI):
         """
         x, y = event.x, event.y
         row, col = x // 100, y // 100
-        if self.game_logic.state[row * 3 + col] != 0:
+        if self.game_logic.game.state[row * 3 + col] != 0:
             return
 
-        self.game_logic.state[row * 3 + col] = 1
+        self.game_logic.game.state[row * 3 + col] = 1
         print(f'Player takes action {row * 3 + col}')
-        print(self.game_logic.state)
+        print(self.game_logic.game.state)
         self.update_status()
         self.computer_turn()
 
@@ -240,10 +238,10 @@ class TicTacToeGUI(GameGUI):
             for j in range(3):
                 x1, y1 = i * 100, j * 100
                 x2, y2 = (i + 1) * 100, (j + 1) * 100
-                if self.game_logic.state[i * 3 + j] == 1:
+                if self.game_logic.game.state[i * 3 + j] == 1:
                     self.canvas.create_oval(
                         x1, y1, x2, y2, outline="black", width=2)
-                elif self.game_logic.state[i * 3 + j] == -1:
+                elif self.game_logic.game.state[i * 3 + j] == -1:
                     self.canvas.create_line(
                         x1, y1, x2, y2, fill="black", width=2)
                     self.canvas.create_line(
@@ -254,9 +252,9 @@ class TicTacToeGUI(GameGUI):
         self.canvas.create_line(0, 100, 300, 100, fill="black", width=2)
         self.canvas.create_line(0, 200, 300, 200, fill="black", width=2)
 
-        print(f'current state: {self.game_logic.state}')
-        print(f'check winner: {self.game_logic.check_winner()}')
-        status = self.game_logic.check_winner(self.game_logic.state)
+        print(f'current state: {self.game_logic.game.state}')
+        print(f'check winner: {self.game_logic.game.is_terminal()}')
+        status = self.game_logic.game.is_terminal(self.game_logic.game.state)
         if status == "Player":
             messagebox.showinfo("Results", "You win!")
             self.reset_game()
@@ -276,12 +274,12 @@ class TicTacToeGUI(GameGUI):
         """
         Computer's turn
         """
-        _, action = self.game_logic.ply(self.game_logic.state.copy())
+        _, action = self.game_logic.ply(self.game_logic.game.state.copy())
         print(f'Computer takes action {action}')
-        if self.game_logic.state[action] != 0:
+        if self.game_logic.game.state[action] != 0:
             action = random.choice(
-                self.game_logic.actions(self.game_logic.state))
-        self.game_logic.state[action] = -1
+                self.game_logic.actions(self.game_logic.game.state))
+        self.game_logic.game.state[action] = -1
         self.update_status()
 
 
