@@ -24,13 +24,12 @@ This repository presents an implementation of the `minimax algorithm`, enhanced 
 
 ## 📚 Background
 
-A game tree is a structure resembling a tree, used to illustrate the potential moves and outcomes in a game. However, its practicality is limited due to the exponential growth of nodes in relation to the tree's depth. For instance, in a game with merely two options per move and a tree depth of 10, we would end up with $2^{10} = 1024$ nodes. In more intricate games, such as chess, the number of nodes can escalate to $10^{120}$, surpassing the total number of atoms in the universe.
+A game tree is a structure resembling a tree, used to illustrate the potential moves and outcomes in a game. However, its practicality is limited due to the exponential growth of nodes in relation to the tree's depth. For instance, in a game with merely two options per move and a tree depth of 10, we would end up with $2^{10} = 1024$ nodes. In more intricate games, such as chess, the number of nodes can escalate to $10^{120}$, surpassing the total number of atoms in the universe. You can see the exponential growth of the game tree in the following gif, all the frames available in the [tree_gif](./images/tree_gif/) folder.
 
 <p align="center">
     <img src="./images/tree_gif/tree.gif" alt="Minimax Tree" width="400" />
-    <em><br>This is a visualization of the expansion of a Tic-Tac-Toe game tree.
-    <br>The utility values are represented by purple squares and smaller red squares.
-    <br>Visuals of the complete search are available in the attached images.</em>
+    <em><br>Vsualization of the expansion of a Tic-Tac-Toe game tree.
+    <br>The utility values are represented by purple squares and smaller red squares.</em>
 </p>
 
 The minimax algorithm is a decision-making tool used to determine the best move for a player in a game. It represents an enhancement over the brute force algorithm, which assesses all potential moves and their results. The premise is that for certain games, we can forecast the game's outcome if both players employ optimal strategies, without the need to evaluate every possible move. For instance, consider the following board configuration in a game of Tic Tac Toe:
@@ -57,28 +56,56 @@ $$
 
 This is a terminal node since 'X' can secure a win. The algorithm evaluates the utility of this node and relays it back to the parent node. Subsequently, the parent node assesses the utility of its child nodes. Here's where it gets interesting - let's assume the parent node represents the first player (max node) and the child nodes represent the second player (min nodes). Contrary to what you might expect, the algorithm selects the minimum utility from the child nodes: the max node chooses the maximum of the minimums, and the min node selects the minimum of the maximums. This counterintuitive approach is why it's called the minimax algorithm. Personally, I find it helpful to consider it as the player's least detrimental option.
 
-The algorithm then backtracks the utility of the child nodes to the parent node, all the way up to the root node, which can then determine the optimal move for the player. The following diagram illustrates the game trees for the Stone Taking Game and Tic Tac Toe, showcasing the minimax decision-making process.
+Formally, the minimax algorithm operates as follows:
+
+$$
+\text{{node value}} =
+\begin{cases}
+\text{{utility}} & \text{{if terminal node}}, \\
+\max(\min(\text{{children values}})) & \text{{if max node}}, \\
+\min(\max(\text{{children values}})) & \text{{if min node}}.
+\end{cases}
+$$
+
+Or alternatively, if we consider nodes as states and actions, the algorithm can be represented as follows:
+
+$$
+\mathrm{max\_value}(state) = \max_{a \in \mathrm{actions}(state)} \mathrm{min\_value}(\mathrm{result}(state, a))
+$$
+
+$$
+\mathrm{min\_value}(state) = \min_{a \in \mathrm{actions}(state)} \mathrm{max\_value}(\mathrm{result}(state, a))
+$$
+
+Where:
+- `state` represents the current state of the game (node in the game tree to be precise).
+- `actions` represents the possible moves the player can make.
+- `result` represents the state of the game after the player makes a move.
+
+The algorithm backtracks from the child nodes to the parent node, propagating the utility values up to the root node. This allows the root node to determine the optimal move for the player. The utility values depend on the game's specific logic. For instance, in the stone tree, the utility is the sum of the stone points. However, given the nature of a two-player zero-sum game, we can represent these values as the difference between the Max and Min scores. Refer to the numbers at the top of the nodes in the diagram below. The red nodes represent the $Min$ player's moves, the blue nodes represent the $Max$ player's moves, and the purple nodes represent the pruned nodes.
+</em>
 
 <p align="center">
-    <img src="./images/stones_game_tree.png" alt="Stones Game Tree" width="600"/>
-    <em><br>Minimax Decision Tree for the Stone Taking Game.
-    <br>The Red Nodes Represent the Min ply and the Blue Nodes Represent the Max ply.
-    <br>The Numbers on the Nodes Represent the different between the Max and Min scores.</em>
+    <img src="./images/stones_game_tree.png" alt="Stones Game Tree" width="400"/>
+    <img src="./images/tic_tac_zoomout.png" alt="Part of Tic Tac Tree" width="400"/>
+    <em><br>Minimax Decision Trees for the Stone Taking Game (left) and Tic Tac Toe (right) games</em>
 </p>
+
+On the Tic Tac Toe tree, the values represent the utility of the game for the $Max$ player (the first player). The red nodes represent the Min ply and the blue nodes represent the Max ply. The purple nodes are the pruned nodes. As can seen, the utility is $1$ for the $Max$ player $X$, $-1$ for the $Min$ player $O$ and 0 for a draw.
 
 <p align="center">
-    <img src="./images/tic_tac_game_tree.png" alt="Tic Tac Toe Game Tree" width="600"/>
-    <em><br>Part Tic Tac Toe Minimax Decision Tree</em>
+    <img src="./images/tic_tac_game_tree.png" alt="Tic Tac Toe Game Tree" width="400"/>
+    <img src="./images/tic_tac_tree_zoom.png" alt="Part of Tic Tac Tree" width="400"/>
+    <em><br>Zoom in and out of part of the Tic Tac Toe Minimax Decision Tree</em>
 </p>
 
-<p align="center">
-    <img src="./images/tic_tac_zoomout.png" alt="Part of Tic Tac Tree" width="600"/>
-    <br>
-    <img src="./images/tic_tac_tree_zoom.png" alt="Part of Tic Tac Tree" width="600"/>
-    <em><br>Zoomin of part of the Tic Tac Toe Minimax Decision Tree</em>
-</p>
+The minimax algorithm is a powerful tool for decision-making in games, but it has its limitations. The game tree's exponential growth can lead to an impractical number of nodes, rendering the algorithm inefficient. This is where $\alpha-\beta$ pruning comes into play. The alpha-beta pruning algorithm is a technique used to reduce the number of nodes evaluated by the minimax algorithm, enhancing its efficiency. The algorithm employs a cutoff mechanism, which ceases the evaluation of nodes that are no longer relevant to the decision-making process. This is achieved by maintaining two values, alpha and beta, which represent the best value for the max and min nodes, respectively. The algorithm then compares the utility of the nodes to these values, and if the utility exceeds the alpha or beta value, the node is pruned.
 
-The minimax algorithm is a powerful tool for decision-making in games, but it has its limitations. The game tree's exponential growth can lead to an impractical number of nodes, rendering the algorithm inefficient. This is where alpha-beta pruning comes into play. It is a technique used to reduce the number of nodes evaluated by the minimax algorithm, enhancing its efficiency. The algorithm employs a cutoff mechanism, which ceases the evaluation of nodes that are no longer relevant to the decision-making process. This is achieved by maintaining two values, alpha and beta, which represent the best value for the max and min nodes, respectively. The algorithm then compares the utility of the nodes to these values, and if the utility exceeds the alpha or beta value, the node is pruned. The following diagram illustrates the alpha-beta pruning process, showcasing the nodes that are pruned from the game tree.
+It is worth noting that even with the alpha-beta pruning, the minimax algorithm is not always the most efficient decision-making tool. Its efficiency is highly dependent on other factors, such as the order of nodes explored and the game's specific logic. Other optimization techniques, such as `killer moves` and `transposition tables`, can further enhance the algorithm's performance. However, it remains a fundamental algorithm for learning and understanding decision-making in games, and a base for more advanced algorithms, such as the `Monte Carlo Tree Search` and `Deep Learning`. For more information on the minimax algorithm and alpha-beta pruning, refer to the following resources:
+
+- [Wikipedia: Minimax](https://en.wikipedia.org/wiki/Minimax)
+- [Wikipedia: Alpha-Beta Pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
+- [GeeksforGeeks: Minimax Algorithm in Game Theory](https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/)
 
 ## 🧩 Algorithm Design
 
