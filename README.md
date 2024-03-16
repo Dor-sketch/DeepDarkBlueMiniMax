@@ -24,7 +24,7 @@ This repository presents an implementation of the `minimax algorithm`, enhanced 
 
 ## 📚 Background
 
-A game tree is a structure resembling a tree, used to illustrate the potential moves and outcomes in a game. However, its practicality is limited due to the exponential growth of nodes in relation to the tree's depth. For instance, in a game with merely two options per move and a tree depth of 10, we would end up with $2^{10} = 1024$ nodes. In more intricate games, such as chess, the number of nodes can escalate to $10^{120}$, surpassing the total number of atoms in the universe. You can see the exponential growth of the game tree in the following gif, all the frames available in the [tree_gif](./images/tree_gif/) folder.
+A game tree is a structure resembling a tree, used to illustrate the potential moves and outcomes in a game. However, its practicality is limited due to the exponential growth of nodes in relation to the tree's depth. For instance, in a game with merely two options per move and a tree depth of 10, we would end up with $2^{10} = 1024$ nodes. In more intricate games, such as chess, the number of nodes can escalate to $10^{120}$, surpassing the total number of atoms in the universe. Tic-Tac-Toe, however, has much fewer: $9! = 362,880$ states. You can see the exponential growth of its game tree in the following GIF (frames available in the [tree_gif](images/tree_gif) folder).
 
 <p align="center">
     <img src="./images/tree_gif/tree.gif" alt="Minimax Tree" width="400" />
@@ -32,7 +32,7 @@ A game tree is a structure resembling a tree, used to illustrate the potential m
     <br>The utility values are represented by purple squares and smaller red squares.</em>
 </p>
 
-The minimax algorithm is a decision-making tool used to determine the best move for a player in a game. It represents an enhancement over the brute force algorithm, which assesses all potential moves and their results. The premise is that for certain games, we can forecast the game's outcome if both players employ optimal strategies, without the need to evaluate every possible move. For instance, consider the following board configuration in a game of Tic Tac Toe:
+The minimax algorithm is a decision-making tool used to determine the best move for a player in a game. It represents an enhancement over the brute force algorithm, which assesses all potential moves and their results. The premise is that for certain games, we can forecast the game's outcome if both players employ optimal strategies, without the need to evaluate every possible move. For instance, consider the following board configuration in a game of Tic-Tac-Toe:
 
 $$
 \left(\begin{array}{ccc}
