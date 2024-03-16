@@ -2,12 +2,10 @@
 This module contains the GUI for the StoneGame and TicTacToe games.
 """
 
-import random
 from tkinter import messagebox
 import tkinter as tk
 from minimax import Minimax
-from game_tree import GameTree
-from game_tic_tac_toe import TicTacToe, GOAL_STATES
+from game_tic_tac_toe import TicTacToe
 from game_stone_game import StoneGame
 
 
@@ -33,7 +31,6 @@ class GameGUI:
             self.frame, text="Reset Game", command=self.reset_game)
         self.change_game_button = tk.Button(
             self.frame, text="Change Game - Beta", command=self.change_game)
-
 
         self.original_stones = self.minimax.game.state.copy()
         self.state = []
@@ -83,16 +80,25 @@ class GameGUI:
 
     def set_styling(self):
         """
-        Set the styling for the buttons
+        Apply an improved, cohesive styling to buttons, enhancing user interface aesthetics.
         """
+        # Defining common style attributes
+        style_config = {
+            # Bold font for better visibility
+            "font": ("Comic Sans MS", 14, "bold"),
+            # "fg": "white",  # White text color for contrast
+            "bg": "#007ACC",  # A pleasant blue background for a modern look
+            "relief": "groove",  # Groove relief adds a subtle depth
+            "borderwidth": 3,  # Slightly thicker border for a standout effect
+            "cursor": "hand2",  # Hand cursor on hover for a more interactive feel
+            "activebackground": "#005C99",  # Darker shade of button color for active state
+            "activeforeground": "light gray",  # Light gray text on active for readability
+            "highlightbackground": "#005C99"  # Darker shade of button color for highlight
+        }
+
         button_list = [self.tree_button, self.take_button, self.shuffle_button]
         for button in button_list:
-            button.config(font=("Comic Sans MS", 14))
-            # button.config(bg='light green')
-            button.config(fg='black')
-            button.config(relief='raised')
-            button.config(borderwidth=2)
-            button.config(cursor='hand2')
+            button.config(**style_config)
 
     def make_tree(self):
         """
@@ -212,7 +218,7 @@ class TicTacToeGUI(GameGUI):
 
     def __init__(self, root, minimax):
         super().__init__(root, minimax)
-        self.root.title("Tic Tac Toe - Try to beat the computer when he starts!")
+        self.root.title("Tic Tac Toe AI")
         self.canvas.bind("<Button-1>", self.click)
         self.computer_player = -1
 
@@ -260,11 +266,10 @@ class TicTacToeGUI(GameGUI):
 
         # Enhancing grid lines for a modern look
         for i in range(1, 3):
-            self.canvas.create_line(100 * i, 0, 100 * i, 300, fill="#A9A9A9", width=2)
-            self.canvas.create_line(0, 100 * i, 300, 100 * i, fill="#A9A9A9", width=2)
-
-
-
+            self.canvas.create_line(
+                100 * i, 0, 100 * i, 300, fill="#A9A9A9", width=2)
+            self.canvas.create_line(
+                0, 100 * i, 300, 100 * i, fill="#A9A9A9", width=2)
 
     def computer_turn(self):
         """

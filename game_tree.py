@@ -1,32 +1,27 @@
-from networkx.drawing.nx_pydot import graphviz_layout
-import networkx as nx
-from matplotlib import pyplot as plt
-from typing import List
-from game_tic_tac_toe import TicTacToe
-MAX_LEVEL = 5
+"""
+GameTree class for the game tree
+"""
 
+from typing import List
+import networkx as nx
+from networkx.drawing.nx_pydot import graphviz_layout
+from matplotlib import pyplot as plt
+from game_tic_tac_toe import TicTacToe
+
+
+MAX_LEVEL = 3
 INITIAL_STATE = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 
 class GameTree:
     """
     GameTree class
     """
 
-    def __str__(self) -> str:
-        ret = ""
-        for node, data in self.G.nodes(data=True):
-
-            board += "\n"
-            for i, s in enumerate(data['state']):
-                board += str(s)
-                if i % 3 == 2:
-                    board += "\n"
-                else:
-                    board += " "
-            ret += f"{node} {board}\n"
-        return ret
-
     def __init__(self, initial_state=None):
+        """
+        Initializes the GameTree class
+        """
         self.G = nx.DiGraph()
         root_ply = [0, INITIAL_STATE, 1]
         self.add_node(root_ply)
@@ -115,12 +110,10 @@ class GameTree:
         if best_move is None:
             return
         result = game.result(cur, best_move)
-        if game.is_terminal(cur) == False:
+        if game.is_terminal(cur) is False:
             self.get_path(result)
             print()
         print(game.print_state(result))
-
-
 
     def update_node_best_move(self, packed_state, move):
         """
@@ -137,11 +130,7 @@ class GameTree:
         Plots the minimax tree
         """
         G = self.G
-        # # check if all nodes have 'level' attribute
-        # if not all('level' in data for node, data in G.nodes(data=True)):
-        #     raise ValueError("All nodes must have a 'level' attribute: node{}".format(
-        #         [node for node, data in G.nodes(data=True) if 'level' not in data]))
-        # assign level 0 to nodes without a level
+
         for node, data in G.nodes(data=True):
             if 'level' not in data:
                 data['level'] = 0
@@ -199,13 +188,10 @@ class GameTree:
 
         plt.show()
 
-
     def print_game_tree_from_node(self, node):
         """
         Prints the game tree from a given node
         """
-        print("nodes in full graph:")
-        print(self.G.nodes(data=True))
         G = self.G
         # choose only the subgraph of the game tree
         subgraph = nx.bfs_tree(G, node)
@@ -213,9 +199,6 @@ class GameTree:
         # copy node data from original graph to subgraph
         for n in subgraph.nodes():
             subgraph.nodes[n].update(G.nodes[n])
-
-        print("Nodes in the subgraph:")
-        print(subgraph.nodes(data=True))
 
         # remove node without a state
         subgraph.remove_nodes_from(
@@ -232,9 +215,25 @@ class GameTree:
         nx.draw_networkx_edges(subgraph, pos, arrowsize=8, edge_color='grey')
         nx.draw_networkx_nodes(
             subgraph, pos, node_shape='s', node_color='lightblue', alpha=0.5)
-        # skip nodes without a state
 
         nx.draw_networkx_labels(
             subgraph, pos, labels={node: '\n'.join([' '.join(['X' if cell == 1 else 'O' if cell == -1 else ' ' for cell in data['state'][i:i+3]]) for i in range(0, 9, 3)]) for node, data in subgraph.nodes(data=True)}, font_size=6, font_color='black')
 
         plt.show()
+
+    def __str__(self) -> str:
+        """
+        return pretty print of the game tree
+        """
+        ret = ""
+        for node, data in self.G.nodes(data=True):
+
+            board += "\n"
+            for i, s in enumerate(data['state']):
+                board += str(s)
+                if i % 3 == 2:
+                    board += "\n"
+                else:
+                    board += " "
+            ret += f"{node} {board}\n"
+        return ret

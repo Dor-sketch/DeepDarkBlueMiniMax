@@ -1,5 +1,5 @@
 """
-TicTacToe class
+TicTacToe class for the game logic of the TicTacToe game
 """
 
 from typing import List
@@ -13,11 +13,11 @@ GOAL_STATES = [  # 8 possible winning combinations
     [1, 4, 7],  # middle column
     [2, 5, 8],  # right column
     [0, 4, 8],  # diagonal
-    [2, 4, 6]  # diagonal
+    [2, 4, 6],  # diagonal
 ]
 
-MAX_PLAYER = 'X'
-MIN_PLAYER = 'O'
+MAX_PLAYER = "X"
+MIN_PLAYER = "O"
 
 
 class TicTacToe(GameLogic):
@@ -26,6 +26,9 @@ class TicTacToe(GameLogic):
     """
 
     def __init__(self):
+        """
+        Initializes the TicTacToe class
+        """
         super().__init__()
         self.rules = "The game is played on a 3x3 grid. Players take turns placing their symbol (X or O) in an empty square. The player who gets 3 of their symbols in a row wins."
         self.state = [0 for _ in range(9)]  # initialize empty board, s_0
@@ -39,7 +42,7 @@ class TicTacToe(GameLogic):
             return []
         return [i for i in range(len(state)) if state[i] == 0]
 
-    def utility(self, state: List[int], player: int=None) -> int:
+    def utility(self, state: List[int], player: int = None) -> int:
         """
         Determines the utility of the current state
         """
@@ -98,7 +101,7 @@ class TicTacToe(GameLogic):
         """
         if state is None:
             state = self.state
-        symbols = {0: ' ', 1: 'X', -1: 'O'}
+        symbols = {0: " ", 1: "X", -1: "O"}
         ret = ""
         for i, s in enumerate(state):
             ret += symbols[s]

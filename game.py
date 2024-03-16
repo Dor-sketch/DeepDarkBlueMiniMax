@@ -39,7 +39,7 @@ class GameLogic:
         """
         pass
 
-    def __str__ (self):
+    def __str__(self):
         """
         return pretty print of the game state
         """
