@@ -9,8 +9,6 @@ The game is implemented using tkinter for the GUI and networkx for the minimax t
 """
 from math import inf
 from typing import List
-import networkx as nx
-from game import GameLogic
 from game_tic_tac_toe import TicTacToe
 from game_tree import GameTree
 
@@ -81,14 +79,12 @@ class Minimax:
         else:
             v, a = self.min_value(state, -float('inf'),
                                   float('inf'), depth, iterations)
-        print(v, a)
         return v, a
 
     def max_value(self, state: List[int], alpha: int, beta: int, depth: int, iterations: int = 4) -> (int, int):
         """
         Returns the maximum value and the action that leads to that value
         """
-        print("in max with state", state)
         ply = [depth, tuple(state), MAX]
         if self.game.is_terminal(state, MAX):
             utility = self.game.utility(state, MAX)
@@ -130,7 +126,6 @@ class Minimax:
         v = inf
         best_move = None
         ply = [depth, tuple(state), MIN]
-        print("in min with state", state)
 
         if self.game.is_terminal(state, MIN):
             v = self.game.utility(state, MIN)

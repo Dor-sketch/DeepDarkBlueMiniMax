@@ -2,19 +2,16 @@
 
 This repository is an implementation of the minimax algorithm with alpha-beta pruning for Artificial Intelligence (AI) decision-making in adversarial search and games. It includes two simple games as examples: the Stone Taking Game and Tic Tac Toe, and also game tree visualization based on the NetworkX library, that can be used to infer decision-making process of adversarial search algorithms.
 
-<p align="center">
-    <img src="./images/stones_game_tree.png" alt="Stones Game Tree" width="600"/>
-    <em>Minimax Decision Tree for the Stone Taking Game. The Red Nodes Represent the Min ply and the Blue Nodes Represent the Max ply. The Numbers on the Nodes Represent the different between the Max and Min scores.</em>
-</p>
-![alt text](image.png)
+![alt text](./images/tic_tac_super_botton2.png)
+
 ---
 
-- [](#)
 - [Backround](#backround)
 - [Algorithm desig](#algorithm-desig)
 - [Example Games](#example-games)
   - [Stone Taking Game](#stone-taking-game)
     - [Features](#features)
+    - [How The Algorithm Works](#how-the-algorithm-works)
   - [Tic Tac Toe](#tic-tac-toe)
 - [Prerequisites](#prerequisites)
 - [How to Run](#how-to-run)
@@ -26,6 +23,12 @@ This repository is an implementation of the minimax algorithm with alpha-beta pr
 ---
 
 ## Backround
+
+<p align="center">
+    <img src="./images/stones_game_tree.png" alt="Stones Game Tree" width="600"/>
+    <em>Minimax Decision Tree for the Stone Taking Game. The Red Nodes Represent the Min ply and the Blue Nodes Represent the Max ply. The Numbers on the Nodes Represent the different between the Max and Min scores.</em>
+</p>
+
 
 A game tree is a tree-like structure that represents the possible moves and outcomes of a game. It is not very practicle to use since the number of nodes in the tree grows exponentially with the depth of the tree. For example, if we have a game with only 2 options for each move and the depth of the tree is 10, we will have $2^10 = 1024$ nodes(!). In complex games like chess, the number of nodes can reach $10^{120}$, which is more than the number of atoms in the universe.
 
@@ -54,6 +57,9 @@ $$
 Is a terminal node since X can win the game. The algorithm then evaluates the utility of the node and returns it to the parent node. The parent node then evaluates the utility of its children. Than comes the tricky part - Lets say that the parent node is the first player (max node) and the children are the second player (min nodes). The algorithm will pick the opposite of what you might think - it will pick the minimum utility of the children: max node will pick the maximum of the minimums and the min node will pick the minimum of the maximums. This is why it is called minimax. Personally, I think it makes it easier to think about it as the least worst option for the player.
 
 The algorithm than backtracks the utility of the children to the parent node up to the root node, wich will be able to pick the best move for the player.
+
+![alt text](./images/tic_tac_gametree1.png)
+![alt text](./images/tic_tac_gametree2.png)
 
 ## Algorithm desig
 
@@ -188,9 +194,18 @@ This game was originally presented in the hard leetcode problem [https://leetcod
 - **Visualization**: Utilizes NetworkX for visualizing the minimax strategy tree, offering insight into the game's decision-making process.
 - **Dynamic Stone Pile**: The number of stones and their values in the pile can be randomized for each game, ensuring a unique experience every time.
 
+#### How The Algorithm Works
+
+The Algorithm implementation uses the different between the player and the computer scores as the utility of the game. This lead to the first player (max node) to try to maximize the utility of the game, and the second player (min node) to try to minimize the utility of the game , wich is equivalent to maximize his own utility (less for player 1 mean more for player 2).
+
 ### Tic Tac Toe
 
+![alt text](./images/tic_tac_super_botton.png)
+
+
 A classic game of Tic Tac Toe with a twist! The game features a graphical user interface (GUI) for interaction and visualizes the game strategy using a minimax algorithm tree. It is designed to provide an engaging and interactive experience for players while demonstrating the minimax algorithm's capabilities.
+
+Note that the algorithm works better when it starts, but it can be changed to start with the second player as well.
 
 <p align="center">
     <img src="./images/tic_tac_game_tree.png" alt="Tic Tac Toe Game Tree" width="600"/>

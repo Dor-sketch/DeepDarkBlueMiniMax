@@ -2,6 +2,7 @@ from typing import List
 import random
 from game import GameLogic
 
+
 class StoneGame(GameLogic):
     """
     StoneGame class

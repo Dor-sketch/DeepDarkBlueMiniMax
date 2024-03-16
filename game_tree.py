@@ -2,13 +2,28 @@ from networkx.drawing.nx_pydot import graphviz_layout
 import networkx as nx
 from matplotlib import pyplot as plt
 from typing import List
+from game_tic_tac_toe import TicTacToe
+MAX_LEVEL = 100000
 
-MAX_LEVEL = 10
 
 class GameTree:
     """
     GameTree class
     """
+
+    def __str__(self) -> str:
+        ret = ""
+        for node, data in self.G.nodes(data=True):
+
+            board += "\n"
+            for i, s in enumerate(data['state']):
+                board += str(s)
+                if i % 3 == 2:
+                    board += "\n"
+                else:
+                    board += " "
+            ret += f"{node} {board}\n"
+        return ret
 
     def __init__(self, initial_state=None):
         self.G = nx.DiGraph()
@@ -16,13 +31,10 @@ class GameTree:
             packed_state = [0, initial_state, 1]
             self.add_node(packed_state)
 
-
     def generate_id(self, state, level, player):
         """
         Generates a unique id for the node
         """
-        print(
-            f'generating id for state {state} at level {level} and player {player}')
         # Convert state to tuple if it is not
         if not isinstance(state, tuple):
             state = tuple(state)
@@ -60,7 +72,6 @@ class GameTree:
 
         if parent_level > MAX_LEVEL or child_level > MAX_LEVEL:
             return
-        print(f'adding edge from {parent_state} to {child_state}')
 
         parent_id = self.generate_id(parent_state, parent_level, parent_player)
         child_id = self.generate_id(child_state, child_level, child_player)
@@ -77,6 +88,18 @@ class GameTree:
         # check if node exists
         if node_id in self.G:
             self.G.nodes[node_id]['value'] = value
+
+    def get_path(self, state):
+        """
+        Returns the path from the root to the node with the given state
+        """
+        cur = state
+        game = TicTacToe()
+        while game.is_terminal(cur) == False:
+            best_move = self.G.nodes[self.generate_id(cur, 0, 1)]['best_move']
+            cur = game.result(cur, best_move)
+            game.print_state(cur)
+            print()
 
     def update_node_best_move(self, packed_state, move):
         """
@@ -102,7 +125,8 @@ class GameTree:
             if 'level' not in data:
                 data['level'] = 0
         # remove node without a state
-        G.remove_nodes_from([node for node, data in G.nodes(data=True) if 'state' not in data])
+        G.remove_nodes_from(
+            [node for node, data in G.nodes(data=True) if 'state' not in data])
         # Get nodes at odd and even levels
         odd_level_nodes = [node for node, data in G.nodes(
             data=True) if data['level'] % 2 == 0]
@@ -135,10 +159,11 @@ class GameTree:
                 if data['value'] is not None:
                     if G.out_degree(node) == 0:
                         plt.text(pos[node][0], pos[node][1] - 0.7, str(data['value']) if data['value'] not in [float('inf'),
-                                    float('-inf')] else "PRUNED DOWN",
+                                                                                                               float('-inf')] else "PRUNED DOWN",
                                  ha='center', va='center',
-                                 bbox=dict(facecolor='blue' if data['value'] == 1 else 'red', alpha=0.5) if data['value'] not in [float('inf'), float('-inf')] else dict(facecolor='purple', alpha=0.2),
-                                    fontsize=4 if data['value'] not in [float('inf'), float('-inf')] else 2)
+                                 bbox=dict(facecolor='blue' if data['value'] == 1 else 'red', alpha=0.5) if data['value'] not in [
+                            float('inf'), float('-inf')] else dict(facecolor='purple', alpha=0.2),
+                            fontsize=4 if data['value'] not in [float('inf'), float('-inf')] else 2)
         else:
             # Draw nodes at odd levels with triangle shape
             nx.draw_networkx_nodes(
@@ -150,8 +175,5 @@ class GameTree:
 
             nx.draw_networkx_labels(
                 G, pos, labels={node: data[label_type] for node, data in G.nodes(data=True)}, font_size=6, font_color='black')
-
-
-
 
         plt.show()

@@ -5,19 +5,20 @@ TicTacToe class
 from typing import List
 from game import GameLogic
 
-GOAL_STATES = [ # 8 possible winning combinations
-    [0, 1, 2], # top row
-    [3, 4, 5], # middle row
-    [6, 7, 8], # bottom row
-    [0, 3, 6], # left column
-    [1, 4, 7], # middle column
-    [2, 5, 8], # right column
-    [0, 4, 8], # diagonal
+GOAL_STATES = [  # 8 possible winning combinations
+    [0, 1, 2],  # top row
+    [3, 4, 5],  # middle row
+    [6, 7, 8],  # bottom row
+    [0, 3, 6],  # left column
+    [1, 4, 7],  # middle column
+    [2, 5, 8],  # right column
+    [0, 4, 8],  # diagonal
     [2, 4, 6]  # diagonal
 ]
 
 MAX_PLAYER = 'X'
 MIN_PLAYER = 'O'
+
 
 class TicTacToe(GameLogic):
     """
@@ -27,7 +28,7 @@ class TicTacToe(GameLogic):
     def __init__(self):
         super().__init__()
         self.rules = "The game is played on a 3x3 grid. Players take turns placing their symbol (X or O) in an empty square. The player who gets 3 of their symbols in a row wins."
-        self.state = [0 for _ in range(9)] # initialize empty board, s_0
+        self.state = [0 for _ in range(9)]  # initialize empty board, s_0
 
     def actions(self, state: List[int]) -> List[int]:
         """
@@ -82,18 +83,16 @@ class TicTacToe(GameLogic):
         if 0 not in state:
             return True
         # check if there is a winner
-        print(state)
         for player in [1, -1]:
             for combo in GOAL_STATES:
                 if all(state[i] == player for i in combo):
                     return True
         return False
 
-
     def __type__(self):
         return "TicTacToe"
 
-    def print_state(self, state: List[int]=None) -> str:
+    def print_state(self, state: List[int] = None) -> str:
         """
         return pretty print of the game state
         """

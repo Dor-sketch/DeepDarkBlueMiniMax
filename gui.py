@@ -28,13 +28,12 @@ class GameGUI:
         self.tree_button = tk.Button(
             self.frame, text="Show Tree", command=self.make_tree)
         self.take_button = tk.Button(
-            self.frame, text="Take Stones", command=self.take_stones)
+            self.frame,  text="Start Super AI", command=self.computer_turn, background='red', activebackground='pink', highlightbackground='red', highlightcolor='red')
         self.shuffle_button = tk.Button(
             self.frame, text="Reset Game", command=self.reset_game)
         self.change_game_button = tk.Button(
-            self.frame, text="Change Game", command=self.change_game)
-        # self.computer_start_button = tk.Button(
-        #     self.frame, text="Computer Start", command=self.computer_turn)
+            self.frame, text="Change Game - Beta", command=self.change_game)
+
 
         self.original_stones = self.minimax.game.state.copy()
         self.state = []
@@ -64,7 +63,6 @@ class GameGUI:
         self.score_label.grid(row=4, column=0)
         self.canvas.grid(row=5, column=0)
         self.change_game_button.grid(row=2, column=1)
-        # self.computer_start_button.grid(row=2, column=2)
 
     def change_game(self):
         """
@@ -90,7 +88,7 @@ class GameGUI:
         button_list = [self.tree_button, self.take_button, self.shuffle_button]
         for button in button_list:
             button.config(font=("Comic Sans MS", 14))
-            button.config(bg='light green')
+            # button.config(bg='light green')
             button.config(fg='black')
             button.config(relief='raised')
             button.config(borderwidth=2)
@@ -214,7 +212,7 @@ class TicTacToeGUI(GameGUI):
 
     def __init__(self, root, minimax):
         super().__init__(root, minimax)
-        self.root.title("Tic Tac Toe")
+        self.root.title("Tic Tac Toe - Try to beat the computer when he starts!")
         self.canvas.bind("<Button-1>", self.click)
         self.computer_player = -1
 
@@ -228,8 +226,6 @@ class TicTacToeGUI(GameGUI):
             return
 
         self.minimax.game.state[row * 3 + col] = - self.computer_player
-        print(f'Player takes action {row * 3 + col}')
-        print(self.minimax.game.state)
         self.update_status()
         self.computer_turn()
 
@@ -255,9 +251,6 @@ class TicTacToeGUI(GameGUI):
         self.canvas.create_line(200, 0, 200, 300, fill="black", width=2)
         self.canvas.create_line(0, 100, 300, 100, fill="black", width=2)
         self.canvas.create_line(0, 200, 300, 200, fill="black", width=2)
-
-        print(f'current state: {self.minimax.game.state}')
-        print(f'check winner: {self.minimax.game.is_terminal()}')
         if self.minimax.game.is_terminal(self.minimax.game.state):
             self.results()
 
@@ -271,10 +264,6 @@ class TicTacToeGUI(GameGUI):
             self.computer_player = -1
         _, action = self.minimax.get_ply_successors(
             self.minimax.game.state.copy())
-        print(f'Computer takes action {action}')
-        if action is None:
-            # computer won!
-            print("Computer won!")
         self.minimax.game.state[action] = self.computer_player
         self.update_status()
 
@@ -284,7 +273,10 @@ class TicTacToeGUI(GameGUI):
         """
         utility = self.minimax.game.utility(self.minimax.game.state, 1)
         if utility == 1:
-            messagebox.showinfo("Results", "You win!")
+            if self.computer_player == 1:
+                messagebox.showinfo("Results", "You lose!")
+            else:
+                messagebox.showinfo("Results", "You win!")
         elif utility == -1:
             messagebox.showinfo("Results", "You lose!")
         else:

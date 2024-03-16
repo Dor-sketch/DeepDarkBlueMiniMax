@@ -3,7 +3,6 @@ This file contains the classes for the game logic of the games StoneGame and Tic
 """
 
 from typing import List
-import random
 
 
 class GameLogic:
@@ -58,4 +57,3 @@ class GameLogic:
         return the type of the game
         """
         pass
-        
