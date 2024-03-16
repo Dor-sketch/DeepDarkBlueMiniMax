@@ -9,8 +9,8 @@ This repository presents an implementation of the `minimax algorithm`, enhanced 
 
 ---
 
-- [📚 Backround](#-backround)
-- [🧩 Algorithm Desig](#-algorithm-desig)
+- [📚 Background](#-background)
+- [🧩 Algorithm Design](#-algorithm-design)
 - [🎮 Example Games](#-example-games)
   - [❌⭕️ Tic Tac Toe](#️-tic-tac-toe)
   - [🪨 Stone Taking Game](#-stone-taking-game)
@@ -22,9 +22,16 @@ This repository presents an implementation of the `minimax algorithm`, enhanced 
 
 ---
 
-## 📚 Backround
+## 📚 Background
 
 A game tree is a structure resembling a tree, used to illustrate the potential moves and outcomes in a game. However, its practicality is limited due to the exponential growth of nodes in relation to the tree's depth. For instance, in a game with merely two options per move and a tree depth of 10, we would end up with $2^{10} = 1024$ nodes. In more intricate games, such as chess, the number of nodes can escalate to $10^{120}$, surpassing the total number of atoms in the universe.
+
+<p align="center">
+    <img src="./images/tree_gif/tree.gif" alt="Minimax Tree" width="400" />
+    <em><br>This is a visualization of the expansion of a Tic-Tac-Toe game tree.
+    <br>The utility values are represented by purple squares and smaller red squares.
+    <br>Visuals of the complete search are available in the attached images.</em>
+</p>
 
 The minimax algorithm is a decision-making tool used to determine the best move for a player in a game. It represents an enhancement over the brute force algorithm, which assesses all potential moves and their results. The premise is that for certain games, we can forecast the game's outcome if both players employ optimal strategies, without the need to evaluate every possible move. For instance, consider the following board configuration in a game of Tic Tac Toe:
 
@@ -73,7 +80,7 @@ The algorithm then backtracks the utility of the child nodes to the parent node,
 
 The minimax algorithm is a powerful tool for decision-making in games, but it has its limitations. The game tree's exponential growth can lead to an impractical number of nodes, rendering the algorithm inefficient. This is where alpha-beta pruning comes into play. It is a technique used to reduce the number of nodes evaluated by the minimax algorithm, enhancing its efficiency. The algorithm employs a cutoff mechanism, which ceases the evaluation of nodes that are no longer relevant to the decision-making process. This is achieved by maintaining two values, alpha and beta, which represent the best value for the max and min nodes, respectively. The algorithm then compares the utility of the nodes to these values, and if the utility exceeds the alpha or beta value, the node is pruned. The following diagram illustrates the alpha-beta pruning process, showcasing the nodes that are pruned from the game tree.
 
-## 🧩 Algorithm Desig
+## 🧩 Algorithm Design
 
 ```python
 class GameLogic:

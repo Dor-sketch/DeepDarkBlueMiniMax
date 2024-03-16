@@ -9,8 +9,9 @@ from matplotlib import pyplot as plt
 from game_tic_tac_toe import TicTacToe
 
 
-MAX_LEVEL = 3
+MAX_LEVEL = 5
 INITIAL_STATE = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+SAVE_TREE_BUILDING = False
 
 
 class GameTree:
@@ -68,6 +69,7 @@ class GameTree:
             self.G.nodes[node_id]['player'] = player
             self.G.nodes[node_id]['value'] = None
 
+
     def add_edge(self, parent: List, child: List):
         """
         Adds an edge to the graph
@@ -81,6 +83,11 @@ class GameTree:
         parent_id = self.generate_id(parent_state, parent_level, parent_player)
         child_id = self.generate_id(child_state, child_level, child_player)
         self.G.add_edge(parent_id, child_id)
+        if SAVE_TREE_BUILDING:
+            # save pic every 10 nodes
+            if len(self.G.nodes) % 10 == 0:
+                self.plot_mini_max_tree(shold_plot=False, label_type="state")
+
 
     def update_node_value(self, packed_state, value):
         """
@@ -125,10 +132,12 @@ class GameTree:
         node_id = self.generate_id(state, level, player)
         self.G.nodes[node_id]['best_move'] = move
 
-    def plot_mini_max_tree(self, label_type="state"):
+    def plot_mini_max_tree(self, label_type="state", shold_plot=True):
         """
         Plots the minimax tree
         """
+        fig = plt.figure(figsize=(15, 15))  # Adjust the size as needed
+
         G = self.G
 
         for node, data in G.nodes(data=True):
@@ -137,6 +146,7 @@ class GameTree:
         # remove node without a state
         G.remove_nodes_from(
             [node for node, data in G.nodes(data=True) if 'state' not in data])
+
         # Get nodes at odd and even levels
         odd_level_nodes = [node for node, data in G.nodes(
             data=True) if data['level'] % 2 == 0]
@@ -144,8 +154,11 @@ class GameTree:
             data=True) if data['level'] % 2 == 1]
 
         # if too big for tree layout, use neato
-        if len(G.nodes) > 400:
+        if len(G.nodes) > 1:
             pos = graphviz_layout(G, prog='neato')
+            # Scale the positions
+            scale_factor = 2  # Adjust this value to get the desired spacing
+            pos = {node: (x*scale_factor, y*scale_factor) for node, (x, y) in pos.items()}
         else:
             # Use graphviz_layout with dot for a tree-like layout
             pos = graphviz_layout(G, prog='dot')
@@ -186,7 +199,13 @@ class GameTree:
             nx.draw_networkx_labels(
                 G, pos, labels={node: data[label_type] for node, data in G.nodes(data=True)}, font_size=6, font_color='black')
 
-        plt.show()
+        if shold_plot:
+            plt.show()
+        # else save the plot as a file
+        else:
+            plt.savefig(f'tree_nu_{len(G.nodes)}_ne_{len(G.edges)}.png', dpi=80, bbox_inches='tight', transparent=True)
+
+        plt.close(fig)
 
     def print_game_tree_from_node(self, node):
         """
