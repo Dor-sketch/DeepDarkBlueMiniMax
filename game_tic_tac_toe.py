@@ -39,7 +39,7 @@ class TicTacToe(GameLogic):
             return []
         return [i for i in range(len(state)) if state[i] == 0]
 
-    def utility(self, state: List[int], player: int) -> int:
+    def utility(self, state: List[int], player: int=None) -> int:
         """
         Determines the utility of the current state
         """
@@ -73,7 +73,7 @@ class TicTacToe(GameLogic):
         super().reset()
         self.state = [0 for _ in range(9)]
 
-    def is_terminal(self, state: List[int] = None, player: int = 1) -> bool:
+    def is_terminal(self, state: List[int] = None, player: int = None) -> bool:
         """
         Determines if the game is in a terminal state
         """

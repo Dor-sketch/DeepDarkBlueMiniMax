@@ -7,7 +7,7 @@ from tkinter import messagebox
 import tkinter as tk
 from minimax import Minimax
 from game_tree import GameTree
-from game_tic_tac_toe import TicTacToe
+from game_tic_tac_toe import TicTacToe, GOAL_STATES
 from game_stone_game import StoneGame
 
 
@@ -20,9 +20,9 @@ class GameGUI:
         self.root = root
         self.minimax = minimax
         self.root.title("My Game")
-        self.root.geometry("400x400")
+        self.root.geometry("400x500")
         self.canvas = tk.Canvas(self.root, width=300,
-                                height=300, bg='light blue')
+                                height=300, bg='white', highlightthickness=0)
         self.frame = tk.Frame(self.root)
         self.frame.grid(padx=5, pady=5)
         self.tree_button = tk.Button(
@@ -224,35 +224,47 @@ class TicTacToeGUI(GameGUI):
         row, col = x // 100, y // 100
         if self.minimax.game.state[row * 3 + col] != 0:
             return
-
         self.minimax.game.state[row * 3 + col] = - self.computer_player
         self.update_status()
-        self.computer_turn()
+        if self.minimax.game.is_terminal(self.minimax.game.state):
+            self.results()
+        else:
+            self.computer_turn()
 
     def update_status(self):
         """
         Update tic tac toe status with X and O
         """
         self.canvas.delete("all")
+        background_color = "#F0F0F0"  # A light grey background for a subtle, modern look
+        self.canvas.config(bg=background_color)
+
         for i in range(3):
             for j in range(3):
                 x1, y1 = i * 100, j * 100
                 x2, y2 = (i + 1) * 100, (j + 1) * 100
+                cell_padding = 20
+                x1 += cell_padding
+                y1 += cell_padding
+                x2 -= cell_padding
+                y2 -= cell_padding
+
                 if self.minimax.game.state[i * 3 + j] == -1:
                     self.canvas.create_oval(
-                        x1, y1, x2, y2, outline="black", width=2)
+                        x1, y1, x2, y2, outline="#1E90FF", width=4, activeoutline="#ADD8E6")
                 elif self.minimax.game.state[i * 3 + j] == 1:
                     self.canvas.create_line(
-                        x1, y1, x2, y2, fill="black", width=2)
+                        x1, y1, x2, y2, fill="#DAA520", width=4, activewidth=5)
                     self.canvas.create_line(
-                        x2, y1, x1, y2, fill="black", width=2)
-        # add grid lines
-        self.canvas.create_line(100, 0, 100, 300, fill="black", width=2)
-        self.canvas.create_line(200, 0, 200, 300, fill="black", width=2)
-        self.canvas.create_line(0, 100, 300, 100, fill="black", width=2)
-        self.canvas.create_line(0, 200, 300, 200, fill="black", width=2)
-        if self.minimax.game.is_terminal(self.minimax.game.state):
-            self.results()
+                        x2, y1, x1, y2, fill="#DAA520", width=4, activewidth=5)
+
+        # Enhancing grid lines for a modern look
+        for i in range(1, 3):
+            self.canvas.create_line(100 * i, 0, 100 * i, 300, fill="#A9A9A9", width=2)
+            self.canvas.create_line(0, 100 * i, 300, 100 * i, fill="#A9A9A9", width=2)
+
+
+
 
     def computer_turn(self):
         """
@@ -260,25 +272,32 @@ class TicTacToeGUI(GameGUI):
         """
         if sum(self.minimax.game.state) == 0:
             self.computer_player = 1
-        elif sum(self.minimax.game.state) == 1:
-            self.computer_player = -1
-        _, action = self.minimax.get_ply_successors(
+
+        action = self.minimax.minimax_move(
             self.minimax.game.state.copy())
         self.minimax.game.state[action] = self.computer_player
         self.update_status()
+        if self.minimax.game.is_terminal(self.minimax.game.state):
+            self.results()
 
     def results(self):
         """
         Display the results of the game based on the utility
         """
+        # force print the wining state
+        self.root.update()
         utility = self.minimax.game.utility(self.minimax.game.state, 1)
         if utility == 1:
             if self.computer_player == 1:
-                messagebox.showinfo("Results", "You lose!")
-            else:
-                messagebox.showinfo("Results", "You win!")
+                if self.computer_player == 1:
+                    messagebox.showinfo("Results", "You lose!")
+                else:
+                    messagebox.showinfo("Results", "You win!")
         elif utility == -1:
-            messagebox.showinfo("Results", "You lose!")
+            if self.computer_player == 1:
+                messagebox.showinfo("Results", "You win!")
+            else:
+                messagebox.showinfo("Results", "You lose!")
         else:
             messagebox.showinfo("Results", "It's a tie!")
         # ask to play again
@@ -286,6 +305,7 @@ class TicTacToeGUI(GameGUI):
             "Play Again", "Do you want to play again?")
         if play_again:
             self.reset_game()
+            self.computer_player = -1
             self.root.mainloop()
         else:
             self.root.destroy()

@@ -3,8 +3,9 @@ import networkx as nx
 from matplotlib import pyplot as plt
 from typing import List
 from game_tic_tac_toe import TicTacToe
-MAX_LEVEL = 100000
+MAX_LEVEL = 5
 
+INITIAL_STATE = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 class GameTree:
     """
@@ -27,17 +28,25 @@ class GameTree:
 
     def __init__(self, initial_state=None):
         self.G = nx.DiGraph()
+        root_ply = [0, INITIAL_STATE, 1]
+        self.add_node(root_ply)
         if initial_state is not None:
-            packed_state = [0, initial_state, 1]
+            packed_state = [0, initial_state, -1]
             self.add_node(packed_state)
 
-    def generate_id(self, state, level, player):
+    def generate_id(self, state, level=None, player=None):
         """
         Generates a unique id for the node
         """
         # Convert state to tuple if it is not
         if not isinstance(state, tuple):
             state = tuple(state)
+
+        level = 0
+        for mark in state:
+            if mark != 0:
+                level += 1
+        player = 1 if level % 2 == 0 else -1
 
         # Generate id
         return "#".join([str(level), str(state), str(player)])
@@ -51,13 +60,14 @@ class GameTree:
         if level > MAX_LEVEL:
             return
         node_id = self.generate_id(state, level, player)
-        if node_id not in self.G or self.G.nodes[node_id]['level'] is None:
+        if node_id not in self.G:
             self.G.add_node(node_id)
             self.G.nodes[node_id]['state'] = state
             level = 0
             for mark in state:
                 if mark != 0:
                     level += 1
+            player = 1 if level % 2 == 0 else -1
             self.G.nodes[node_id]['level'] = level
             # player can also be calculated based on level
             self.G.nodes[node_id]['player'] = player
@@ -95,11 +105,22 @@ class GameTree:
         """
         cur = state
         game = TicTacToe()
-        while game.is_terminal(cur) == False:
-            best_move = self.G.nodes[self.generate_id(cur, 0, 1)]['best_move']
-            cur = game.result(cur, best_move)
-            game.print_state(cur)
+        cur_level = 0
+        for mark in cur:
+            if mark != 0:
+                cur_level += 1
+        cur_player = 1 if cur_level % 2 == 0 else -1
+        best_move = self.G.nodes[self.generate_id(
+            cur, cur_level, cur_player)]['best_move']
+        if best_move is None:
+            return
+        result = game.result(cur, best_move)
+        if game.is_terminal(cur) == False:
+            self.get_path(result)
             print()
+        print(game.print_state(result))
+
+
 
     def update_node_best_move(self, packed_state, move):
         """
@@ -111,7 +132,7 @@ class GameTree:
         node_id = self.generate_id(state, level, player)
         self.G.nodes[node_id]['best_move'] = move
 
-    def plot_mini_max_tree(self, label_type="value"):
+    def plot_mini_max_tree(self, label_type="state"):
         """
         Plots the minimax tree
         """
@@ -175,5 +196,45 @@ class GameTree:
 
             nx.draw_networkx_labels(
                 G, pos, labels={node: data[label_type] for node, data in G.nodes(data=True)}, font_size=6, font_color='black')
+
+        plt.show()
+
+
+    def print_game_tree_from_node(self, node):
+        """
+        Prints the game tree from a given node
+        """
+        print("nodes in full graph:")
+        print(self.G.nodes(data=True))
+        G = self.G
+        # choose only the subgraph of the game tree
+        subgraph = nx.bfs_tree(G, node)
+
+        # copy node data from original graph to subgraph
+        for n in subgraph.nodes():
+            subgraph.nodes[n].update(G.nodes[n])
+
+        print("Nodes in the subgraph:")
+        print(subgraph.nodes(data=True))
+
+        # remove node without a state
+        subgraph.remove_nodes_from(
+            [node for node, data in subgraph.nodes(data=True) if 'state' not in data])
+
+        # if too big for tree layout, use neato
+        if len(subgraph.nodes) > 400:
+            pos = graphviz_layout(subgraph, prog='neato')
+        else:
+            # Use graphviz_layout with dot for a tree-like layout
+            pos = graphviz_layout(subgraph, prog='dot')
+
+        # Draw edges and labels for all nodes
+        nx.draw_networkx_edges(subgraph, pos, arrowsize=8, edge_color='grey')
+        nx.draw_networkx_nodes(
+            subgraph, pos, node_shape='s', node_color='lightblue', alpha=0.5)
+        # skip nodes without a state
+
+        nx.draw_networkx_labels(
+            subgraph, pos, labels={node: '\n'.join([' '.join(['X' if cell == 1 else 'O' if cell == -1 else ' ' for cell in data['state'][i:i+3]]) for i in range(0, 9, 3)]) for node, data in subgraph.nodes(data=True)}, font_size=6, font_color='black')
 
         plt.show()
