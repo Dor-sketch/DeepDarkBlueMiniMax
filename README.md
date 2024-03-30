@@ -253,6 +253,7 @@ pip install pygame
 <p align="center">
     <img src="./images/dark_pro.gif" alt="Pro Game" width="400" />
     <em><br>New Pygame GUI for Tic-tac-toe</em>
+</p>
 
 ## 🏃‍♂️ How to Run
 
