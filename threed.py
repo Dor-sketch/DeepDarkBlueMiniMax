@@ -1,12 +1,17 @@
+"""
+This file contains the code for the 3D-like Tic-Tac-Toe game using Pygame.
+"""
+import math
 import pygame
-from minimax import Minimax
-from game_tic_tac_toe import TicTacToe
 import pygame.gfxdraw
 import numpy as np
-import pygame.gfxdraw
-
+from minimax import Minimax
+from game_tic_tac_toe import TicTacToe
 
 class GameGUI:
+    """
+    This class is responsible for the graphical user interface of the Tic-Tac-Toe game.
+    """
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((600, 600))
@@ -16,6 +21,25 @@ class GameGUI:
         self.board = self.game.state
         self.player_turn = True
         pygame.display.set_caption("Deep Dark Blue Mini Max Pro")
+
+
+    def animate_last_move(self, last_move):
+        # Save the current state of the board
+        current_state = self.board.copy()
+
+        # Clear the last move on the board
+        self.board[last_move] = 0
+
+        # Animate the move
+        for i in range(10):
+            # Draw the move gradually
+            self.board[last_move] = i / 10.0
+            self.draw_board()
+            pygame.display.flip()
+            pygame.time.delay(10)  # delay for 20 milliseconds
+
+        # Restore the current state of the board
+        self.board = current_state
 
     def draw_board(self):
         # Create a surface with a vertical gradient
@@ -43,8 +67,6 @@ class GameGUI:
         lighting.fill((255, 255, 255, 100))  # Reduced intensity
         self.screen.blit(lighting, (0, 0),
                          special_flags=pygame.BLEND_RGBA_MULT)
-
-
 
         # Draw the X's and O's with a 3D effect
         # Draw the X's and O's with a 3D effect
@@ -82,41 +104,64 @@ class GameGUI:
 
     def display_message(self, message):
         pygame.font.init()
-        myfont = pygame.font.SysFont('Comic Sans MS', 30)
-        textsurface = myfont.render(message, False, (255, 255, 255))
-        self.screen.blit(textsurface, (200, 550))
+        myfont = pygame.font.Font('freesansbold.ttf', 32)  # Change the font and size
+        textsurface = myfont.render(message, True, (0, 255, 0))  # Change the color
+        textRect = textsurface.get_rect()  # Get the rectangular area of the text
+        textRect.center = (self.screen.get_width() // 2, self.screen.get_height() // 2)  # Center the text
+        self.screen.blit(textsurface, textRect)
+    import math
 
     def play_again(self):
-        self.display_message("Play Again?")
-        pygame.display.flip()
+        # Initialize a variable for the animation
+        animation_time = 0
+
         while True:
+            # Calculate the hover effect
+            hover_effect = math.sin(animation_time) * 10
+
+            # Clear the screen for the next frame
+            self.screen.fill((0, 0, 0))
+
+            # Display the message
+            self.display_message("Play Again?")
+
+            # Draw the shape with the hover effect
+            pygame.draw.polygon(self.screen, (0, 255, 0), [(200, 550 + hover_effect), (300, 580 + hover_effect), (400, 550 + hover_effect)])
+
+            # Update the display
+            pygame.display.flip()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     x, y = pygame.mouse.get_pos()
-                    if 200 <= x <= 400 and 550 <= y <= 580:  # Check if the click is within the "Play Again?" message
+                    if 200 <= x <= 400 and (550 + hover_effect) <= y <= (580 + hover_effect):  # Check if the click is within the "Play Again?" message
                         self.game = TicTacToe()
                         self.board = self.game.state
                         self.player_turn = True
                         return True
-            self.clock.tick(60)
 
+            # Update the animation time
+            animation_time += 0.1
+
+            self.clock.tick(60)
     def run(self):
         running = True
         while running:
             self.draw_board()
             pygame.display.flip()
             running = self.handle_events()
-            self.clock.tick(60)
+            self.clock.tick(120)
             if not self.player_turn and not self.game.is_terminal(self.board):
                 action = self.minimax.minimax_move(
                     self.board.copy())  # Use the current board state
                 self.board = self.game.result(self.board, action)
-                self.draw_board()
+                self.animate_last_move(action)
 
                 self.player_turn = True
             if self.game.is_terminal(self.board):
+                self.draw_board()
                 running = self.play_again()
 
 

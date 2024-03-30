@@ -3,7 +3,7 @@
 This repository presents an implementation of the `minimax algorithm`, enhanced with `alpha-beta pruning`, designed for `AI decision-making in competitive search scenarios and games`. It showcases the algorithm through two straightforward examples: the Stone Taking Game and Tic-tac-toe. Additionally, it features game tree visualization utilizing the NetworkX library, providing insights into the decision-making process employed by adversarial search algorithms.
 
 <p align="center">
-    <img src="./images/gif/game.gif" alt="Tic-tac-toe" width="400" />
+    <img src="./images/cover.gif" alt="Tic-tac-toe" width="520" />
     <em><br>Interactive Tic-tac-toe Gameplay</em>
 </p>
 
@@ -111,7 +111,26 @@ On the Tic-tac-toe tree, the values represent the utility of the game for the $M
 
 The minimax algorithm is a powerful tool for decision-making in games, but it has its limitations. The game tree's exponential growth can lead to an impractical number of nodes, rendering the algorithm inefficient. This is where $\alpha-\beta$ pruning comes into play. The alpha-beta pruning algorithm is a technique used to reduce the number of nodes evaluated by the minimax algorithm, enhancing its efficiency. The algorithm employs a cutoff mechanism, which ceases the evaluation of nodes that are no longer relevant to the decision-making process. This is achieved by maintaining two values, alpha and beta, which represent the best value for the $Max$ and $Min$ nodes, respectively. The algorithm then compares the utility of the nodes to these values, and if the utility exceeds the alpha or beta value, the node is pruned.
 
-It is worth noting that even with the alpha-beta pruning, the minimax algorithm is not always the most efficient decision-making tool. Its efficiency is highly dependent on other factors, such as the order of nodes explored and the game's specific logic. Other optimization techniques, such as `killer moves` and `transposition tables`, can further enhance the algorithm's performance. However, it remains a fundamental algorithm for learning and understanding decision-making in games, and a base for more advanced algorithms, such as the `Monte Carlo Tree Search` and `Deep Learning`. For more information on the minimax algorithm and alpha-beta pruning, refer to the following resources:
+It is worth noting that even with the alpha-beta pruning, the minimax algorithm is not always the most efficient decision-making tool. Its efficiency is highly dependent on other factors, such as the order of nodes explored and the game's specific logic. Other optimization techniques, such as `killer moves` and `transposition tables`, can further enhance the algorithm's performance. However, it remains a fundamental algorithm for learning and understanding decision-making in games, and a base for more advanced algorithms, such as the `Monte Carlo Tree Search` and `Deep Learning`.
+
+
+A good example of a non-optimal behavior of the minimax algorithm can be demonstrated by the length of the game. In the following example, the algorithm plays 'O', and I play 'X'. The algorithm is going to win, but it is not playing the optimal moves in regarding to game length, thus leading to a longer game.
+
+<p align="center">
+    <img src="./images/non_optimal.gif" alt="Non-optimal Minimax" width="320" />
+    <em><br>Redundant moves, algorithm plays 'O' and I play 'X'.</em>
+</p>
+
+At first glance, you may wonder why the algorithm did not complete the middle column, but instead, it played in the left-center cell. The reason is that the current implementation sees both moves as equivalent because in any case, it is going to win. To avoid this, it is possible to implement more advanced techniques.
+
+<p align="center">
+    <img src="./images/d.png" alt="Non-optimal Minimax" width="400" />
+    <p align="center"><em>A secure win for the algorithm leads to longer games.</em>
+</p>
+
+This scenario is a classic example of how a purely win-focused approach in minimax algorithms can lead to suboptimal play in terms of efficiency or game length. This behavior arises from the algorithm's design, which assesses moves based purely on their outcome (win, lose, or draw) without considering the number of steps required to reach that outcome. Consequently, when multiple paths lead to a win, the algorithm might not choose the shortest one, leading to unnecessarily prolonged games.
+
+In conclusion, Minimax algorithms work by exploring all possible moves in a game, predicting the opponent's responses, and choosing a move that maximizes the algorithm's chances of winning, assuming the opponent plays optimally. In tic-tac-toe, as in your example, this often means the algorithm can identify several winning strategies without differentiating based on game length. For more information on the minimax algorithm and alpha-beta pruning, refer to the following resources:
 
 - [Wikipedia: Minimax](https://en.wikipedia.org/wiki/Minimax)
 - [Wikipedia: Alpha-Beta Pruning](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
