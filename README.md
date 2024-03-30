@@ -1,10 +1,10 @@
 # 👾 Deep Dark Blue Mini Max
 
-This repository presents an implementation of the `minimax algorithm`, enhanced with `alpha-beta pruning`, designed for `AI decision-making in competitive search scenarios and games`. It showcases the algorithm through two straightforward examples: the Stone Taking Game and Tic Tac Toe. Additionally, it features game tree visualization utilizing the NetworkX library, providing insights into the decision-making process employed by adversarial search algorithms.
+This repository presents an implementation of the `minimax algorithm`, enhanced with `alpha-beta pruning`, designed for `AI decision-making in competitive search scenarios and games`. It showcases the algorithm through two straightforward examples: the Stone Taking Game and Tic-tac-toe. Additionally, it features game tree visualization utilizing the NetworkX library, providing insights into the decision-making process employed by adversarial search algorithms.
 
 <p align="center">
-    <img src="./images/gif/game.gif" alt="Tic Tac Toe" width="400" />
-    <em><br>Interactive Tic Tac Toe Gameplay</em>
+    <img src="./images/gif/game.gif" alt="Tic-tac-toe" width="400" />
+    <em><br>Interactive Tic-tac-toe Gameplay</em>
 </p>
 
 ---
@@ -13,7 +13,7 @@ This repository presents an implementation of the `minimax algorithm`, enhanced 
 - [📚 Background](#-background)
 - [🧩 Algorithm Design](#-algorithm-design)
 - [🎮 Example Games](#-example-games)
-  - [❌⭕️ Tic Tac Toe](#️-tic-tac-toe)
+  - [❌⭕️ Tic-tac-toe](#️-tic-tac-toe)
   - [🪨 Stone Taking Game](#-stone-taking-game)
 - [📋 Prerequisites](#-prerequisites)
 - [🏃‍♂️ How to Run](#️-how-to-run)
@@ -64,7 +64,7 @@ O & [X] & O\\
 \end{array}\right)
 $$
 
-This is a terminal node since 'X' can secure a win. The algorithm evaluates the utility of this node and relays it back to the parent node. Subsequently, the parent node assesses the utility of its child nodes. Here's where it gets interesting - let's assume the parent node represents the first player (max node) and the child nodes represent the second player (min nodes). Contrary to what you might expect, the algorithm selects the minimum utility from the child nodes: the max node chooses the maximum of the minimums, and the min node selects the minimum of the maximums. This counterintuitive approach is why it's called the minimax algorithm. Personally, I find it helpful to consider it as the player's least detrimental option.
+This is a terminal node since 'X' can secure a win. The algorithm evaluates the utility of this node and relays it back to the parent node. Subsequently, the parent node assesses the utility of its child nodes. Here's where it gets interesting - let's assume the parent node represents the first player (max node) and the child nodes represent the second player ($Min$ nodes). Contrary to what you might expect, the algorithm selects the minimum utility from the child nodes: the max node chooses the maximum of the minimums, and the $Min$ node selects the minimum of the maximums. This counterintuitive approach is why it's called the minimax algorithm. Personally, I find it helpful to consider it as the player's least detrimental option.
 
 Formally, the minimax algorithm operates as follows:
 
@@ -72,8 +72,8 @@ $$
 \text{{node value}} =
 \begin{cases}
 \text{{utility}} & \text{{if terminal node}}, \\
-\max(\min(\text{{children values}})) & \text{{if max node}}, \\
-\min(\max(\text{{children values}})) & \text{{if min node}}.
+\max(\min(\text{{children values}})) & \text{{if Max node}}, \\
+\min(\max(\text{{children values}})) & \text{{if Min node}}.
 \end{cases}
 $$
 
@@ -92,24 +92,24 @@ Where:
 - `actions` represents the possible moves the player can make.
 - `result` represents the state of the game after the player makes a move.
 
-The algorithm backtracks from the child nodes to the parent node, propagating the utility values up to the root node. This allows the root node to determine the optimal move for the player. The utility values depend on the game's specific logic. For instance, in the stone tree, the utility is the sum of the stone points. However, given the nature of a two-player zero-sum game, we can represent these values as the difference between the Max and Min scores. Refer to the numbers at the top of the nodes in the diagram below. The red nodes represent the $Min$ player's moves, the blue nodes represent the $Max$ player's moves, and the purple nodes represent the pruned nodes.
+The algorithm backtracks from the child nodes to the parent node, propagating the utility values up to the root node. This allows the root node to determine the optimal move for the player. The utility values depend on the game's specific logic. For instance, in the stone tree, the utility is the sum of the stone points. However, given the nature of a two-player zero-sum game, we can represent these values as the difference between the $Max$ and $Min$ scores. Refer to the numbers at the top of the nodes in the diagram below. The red nodes represent the $Min$ player's moves, the blue nodes represent the $Max$ player's moves, and the purple nodes represent the pruned nodes.
 </em>
 
 <p align="center">
     <img src="./images/stones_game_tree.png" alt="Stones Game Tree" width="400"/>
     <img src="./images/tic_tac_zoomout.png" alt="Part of Tic Tac Tree" width="400"/>
-    <em><br>Minimax Decision Trees for the Stone Taking Game (left) and Tic Tac Toe (right) games</em>
+    <em><br>Minimax Decision Trees for the Stone Taking Game (left) and Tic-tac-toe (right) games</em>
 </p>
 
-On the Tic Tac Toe tree, the values represent the utility of the game for the $Max$ player (the first player). The red nodes represent the Min ply and the blue nodes represent the Max ply. The purple nodes are the pruned nodes. As can seen, the utility is $1$ for the $Max$ player $X$, $-1$ for the $Min$ player $O$ and 0 for a draw.
+On the Tic-tac-toe tree, the values represent the utility of the game for the $Max$ player (the first player). The red nodes represent the $Min$ ply and the blue nodes represent the $Max$ ply. The purple nodes are the pruned nodes. As can seen, the utility is $1$ for the $Max$ player $X$, $-1$ for the $Min$ player $O$ and 0 for a draw.
 
 <p align="center">
-    <img src="./images/tic_tac_game_tree.png" alt="Tic Tac Toe Game Tree" width="400"/>
+    <img src="./images/tic_tac_game_tree.png" alt="Tic-tac-toe Game Tree" width="400"/>
     <img src="./images/tic_tac_tree_zoom.png" alt="Part of Tic Tac Tree" width="400"/>
-    <em><br>Zoom in and out of part of the Tic Tac Toe Minimax Decision Tree</em>
+    <em><br>Zoom in and out of part of the Tic-tac-toe Minimax Decision Tree</em>
 </p>
 
-The minimax algorithm is a powerful tool for decision-making in games, but it has its limitations. The game tree's exponential growth can lead to an impractical number of nodes, rendering the algorithm inefficient. This is where $\alpha-\beta$ pruning comes into play. The alpha-beta pruning algorithm is a technique used to reduce the number of nodes evaluated by the minimax algorithm, enhancing its efficiency. The algorithm employs a cutoff mechanism, which ceases the evaluation of nodes that are no longer relevant to the decision-making process. This is achieved by maintaining two values, alpha and beta, which represent the best value for the max and min nodes, respectively. The algorithm then compares the utility of the nodes to these values, and if the utility exceeds the alpha or beta value, the node is pruned.
+The minimax algorithm is a powerful tool for decision-making in games, but it has its limitations. The game tree's exponential growth can lead to an impractical number of nodes, rendering the algorithm inefficient. This is where $\alpha-\beta$ pruning comes into play. The alpha-beta pruning algorithm is a technique used to reduce the number of nodes evaluated by the minimax algorithm, enhancing its efficiency. The algorithm employs a cutoff mechanism, which ceases the evaluation of nodes that are no longer relevant to the decision-making process. This is achieved by maintaining two values, alpha and beta, which represent the best value for the $Max$ and $Min$ nodes, respectively. The algorithm then compares the utility of the nodes to these values, and if the utility exceeds the alpha or beta value, the node is pruned.
 
 It is worth noting that even with the alpha-beta pruning, the minimax algorithm is not always the most efficient decision-making tool. Its efficiency is highly dependent on other factors, such as the order of nodes explored and the game's specific logic. Other optimization techniques, such as `killer moves` and `transposition tables`, can further enhance the algorithm's performance. However, it remains a fundamental algorithm for learning and understanding decision-making in games, and a base for more advanced algorithms, such as the `Monte Carlo Tree Search` and `Deep Learning`. For more information on the minimax algorithm and alpha-beta pruning, refer to the following resources:
 
@@ -195,11 +195,11 @@ Each game utilizes a the `Game` class, which is a base class for the games. It c
 
 <p align="center">
     <img src="./images/stone_game.png" alt="Stone Game" width="300" />
-    <img src="./images/tic_tac_toe.png" alt="Tic Tac Toe" width="300" />
+    <img src="./images/tic_tac_toe.png" alt="Tic-tac-toe" width="300" />
 </p>
 
 
-### ❌⭕️ Tic Tac Toe
+### ❌⭕️ Tic-tac-toe
 
 <p align="center">
     <img src="./images/loose_board.png"width="300"/>
@@ -209,12 +209,12 @@ Each game utilizes a the `Game` class, which is a base class for the games. It c
 
 The game features a graphical user interface (GUI) for interaction and visualizes the game strategy using a minimax algorithm tree. It is designed to provide an engaging and interactive experience for players while demonstrating the minimax algorithm's capabilities.
 
-The following figures illustrate a boarder game tree for the Tic Tac Toe game, showcasing the minimax decision-making process:
+The following figures illustrate a boarder game tree for the Tic-tac-toe game, showcasing the minimax decision-making process:
 
 <p align="center">
-    <img src="./images/tic_tac_gametree2.png" alt="Tic Tac Toe Game Tree" width="600"/>
-    <img src="./images/tic_tac_gametree1.png" alt="Tic Tac Toe Game Tree" width="600"/>
-    <em><br>Part Tic Tac Toe Minimax Decision Tree
+    <img src="./images/tic_tac_gametree2.png" alt="Tic-tac-toe Game Tree" width="600"/>
+    <img src="./images/tic_tac_gametree1.png" alt="Tic-tac-toe Game Tree" width="600"/>
+    <em><br>Part Tic-tac-toe Minimax Decision Tree
     <br>Purple leafs mark prunings.</em>
 </p>
 
@@ -224,7 +224,7 @@ The following figures illustrate a boarder game tree for the Tic Tac Toe game, s
 
 The game was initially introduced as a `Hard` problem on LeetCode <https://leetcode.com/problems/stone-game-iii/>. While this implementation doesn't apply to the LeetCode problem, it remains an entertaining game to engage in. Its primary objective is to illustrate the minimax algorithm, providing an interactive platform for players. Additionally, it offers insights into the game's decision-making process and the alpha-beta pruning algorithm.
 
-Specific to the Stone Taking Game, the Algorithm implementation uses the different between the player and the computer scores as the utility of the game. This lead to the first player (max node) to try to maximize the utility of the game, and the second player (min node) to try to minimize the utility of the game , wich is equivalent to maximize his own utility (less for player 1 mean more for player 2).
+Specific to the Stone Taking Game, the Algorithm implementation uses the different between the player and the computer scores as the utility of the game. This lead to the first player ($Max$ node) to try to maximize the utility of the game, and the second player ($Min$ node) to try to minimize the utility of the game , wich is equivalent to maximize his own utility (less for player 1 mean more for player 2).
 
 Included Features:
 
@@ -243,6 +243,16 @@ Before running the game, ensure you have the following installed:
 - NetworkX
 - Matplotlib
 - PyDot (for tree visualization)
+
+For the Pygame GUI, you will need to install the Pygame library:
+
+```bash
+pip install pygame
+```
+
+<p align="center">
+    <img src="./images/dark_pro.gif" alt="Pro Game" width="400" />
+    <em><br>New Pygame GUI for Tic-tac-toe</em>
 
 ## 🏃‍♂️ How to Run
 
