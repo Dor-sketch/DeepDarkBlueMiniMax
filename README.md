@@ -9,6 +9,7 @@ This repository presents an implementation of the `minimax algorithm`, enhanced 
 
 ---
 
+- [🚀 Update: Pygame Support](#-update-pygame-support)
 - [📚 Background](#-background)
 - [🧩 Algorithm Design](#-algorithm-design)
 - [🎮 Example Games](#-example-games)
@@ -21,6 +22,15 @@ This repository presents an implementation of the `minimax algorithm`, enhanced 
 - [📜 License](#-license)
 
 ---
+
+## 🚀 Update: Pygame Support
+
+The program now supports the `Pygame` library, offering an enhanced gaming experience with improved graphics and interactivity. To use the Pygame GUI, simply run the `threed.py` script - the game will launch in a Pygame window. The Pygame GUI provides a more engaging and visually appealing interface for players, enhancing the overall gaming experience.
+
+<p align="center">
+    <img src="./images/pygame_gui_bright.png" alt="Pygame GUI" width="400" />
+    <img src="./images/pygame_gui.png" alt="Pygame GUI" width="400" />
+</p>
 
 ## 📚 Background
 

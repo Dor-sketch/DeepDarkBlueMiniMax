@@ -3,6 +3,8 @@ from minimax import Minimax
 from game_tic_tac_toe import TicTacToe
 import pygame.gfxdraw
 import numpy as np
+import pygame.gfxdraw
+
 
 class GameGUI:
     def __init__(self):
@@ -13,43 +15,55 @@ class GameGUI:
         self.minimax = Minimax(self.game)
         self.board = self.game.state
         self.player_turn = True
+        pygame.display.set_caption("Deep Dark Blue Mini Max Pro")
+
     def draw_board(self):
         # Create a surface with a vertical gradient
         gradient = pygame.Surface((600, 600))
-        for y in range(600):
-            color = (y // 3, y // 3, y // 3)
-            pygame.draw.line(gradient, color, (0, y), (600, y))
+        for i in range(600):
+            color = np.array([0, 0, 0]) + i * np.array([255, 255, 255]) / 800
+            pygame.draw.line(gradient, color, (0, i), (600, i))
 
         # Blit the gradient onto the screen
         self.screen.blit(gradient, (0, 0))
+        # Create a surface for the glowing effect
+        glow = pygame.Surface((600, 600), pygame.SRCALPHA)
+        # iphone pro max shade
+        glow.fill((160, 160, 152, 100))  # Changed color to blue
+        self.screen.blit(glow, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
-        # Draw the grid lines with a shadow effect
-        for i in range(1, 3):
-            pygame.draw.line(self.screen, (100, 100, 100), (200*i+2, 2), (200*i+2, 602), 5)
-            pygame.draw.line(self.screen, (100, 100, 100), (2, 200*i+2), (602, 200*i+2), 5)
-            pygame.draw.line(self.screen, (255, 255, 255), (200*i, 0), (200*i, 600), 5)
-            pygame.draw.line(self.screen, (255, 255, 255), (0, 200*i), (600, 200*i), 5)
-
-        # Draw the X's and O's as polygons with a 3D effect
-        for y in range(3):
-            for x in range(3):
-                center = (200 * x + 100, 200 * y + 100)
-                if self.board[y * 3 + x] == 1:
-                    pygame.draw.polygon(self.screen, (255, 0, 0), [(center[0] - 40, center[1] - 40), (center[0] + 40, center[1] - 40), (center[0] + 40, center[1] + 40), (center[0] - 40, center[1] + 40)], 5)
-                    pygame.draw.polygon(self.screen, (200, 0, 0), [(center[0] - 42, center[1] - 42), (center[0] + 42, center[1] - 42), (center[0] + 42, center[1] + 42), (center[0] - 42, center[1] + 42)], 5)
-                elif self.board[y * 3 + x] == -1:
-                    pygame.draw.polygon(self.screen, (0, 255, 0), [(center[0] - 40, center[1] - 40), (center[0] + 40, center[1] - 40), (center[0] + 40, center[1] + 40), (center[0] - 40, center[1] + 40)], 5)
-                    pygame.draw.polygon(self.screen, (0, 200, 0), [(center[0] - 42, center[1] - 42), (center[0] + 42, center[1] - 42), (center[0] + 42, center[1] + 42), (center[0] - 42, center[1] + 42)], 5)
+        # Draw lines around the block to create a 3D shadow effect
+        for i in range(1, 5):
+            color = np.array([0, 0, 0]) + i * np.array([255, 255, 255]) / 5
+            pygame.draw.line(self.screen, color, (200 * i, 0), (200 * i, 600), 5)
+            pygame.draw.line(self.screen, color, (0, 200 * i), (600, 200 * i), 5)
 
         # Create a surface for the lighting effect
         lighting = pygame.Surface((600, 600), pygame.SRCALPHA)
-        lighting.fill((255, 255, 255, 50))  # Reduced intensity
-        self.screen.blit(lighting, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        lighting.fill((255, 255, 255, 100))  # Reduced intensity
+        self.screen.blit(lighting, (0, 0),
+                         special_flags=pygame.BLEND_RGBA_MULT)
 
-        # Create a surface for the glowing effect
-        glow = pygame.Surface((600, 600), pygame.SRCALPHA)
-        glow.fill((100, 100, 255, 50))  # Changed color to blue
-        self.screen.blit(glow, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+
+
+        # Draw the X's and O's with a 3D effect
+        # Draw the X's and O's with a 3D effect
+        for y in range(3):
+            for x in range(3):
+                center = (200 * x + 100, 200 * y + 100)
+                if self.board[y * 3 + x] == 1:  # Draw X
+                    for i in range(10):  # Increase range for thicker X
+                        pygame.draw.aaline(self.screen, (255 - i * 15, i * 5, 0), (center[0] - 60 + i, center[1] - 60 + i), (
+                            center[0] + 60 + i, center[1] + 60 + i), 3)  # Increase width for thicker line
+                        pygame.draw.aaline(self.screen, (255 - i * 15, i * 5, 0), (center[0] + 60 + i, center[1] - 60 + i), (
+                            center[0] - 60 + i, center[1] + 60 + i), 3)  # Increase width for thicker line
+
+                elif self.board[y * 3 + x] == -1:  # Draw O
+                    for i in range(10):  # Increase range for thicker O
+                        # Increase width for thicker circle
+                        pygame.gfxdraw.aacircle(
+                            self.screen, center[0], center[1], 50 + i, (11, 11, 255 - i * 15))
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -65,6 +79,7 @@ class GameGUI:
                         self.board = self.game.result(self.board, action)
                         self.player_turn = False
         return True
+
     def display_message(self, message):
         pygame.font.init()
         myfont = pygame.font.SysFont('Comic Sans MS', 30)
@@ -95,11 +110,15 @@ class GameGUI:
             running = self.handle_events()
             self.clock.tick(60)
             if not self.player_turn and not self.game.is_terminal(self.board):
-                action = self.minimax.minimax_move(self.board.copy())  # Use the current board state
+                action = self.minimax.minimax_move(
+                    self.board.copy())  # Use the current board state
                 self.board = self.game.result(self.board, action)
+                self.draw_board()
+
                 self.player_turn = True
             if self.game.is_terminal(self.board):
                 running = self.play_again()
+
 
 if __name__ == "__main__":
     gui = GameGUI()
