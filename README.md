@@ -16,6 +16,8 @@ This repository presents an implementation of the `minimax algorithm`, enhanced 
   - [❌⭕️ Tic-tac-toe](#️-tic-tac-toe)
   - [🪨 Stone Taking Game](#-stone-taking-game)
 - [📋 Prerequisites](#-prerequisites)
+  - [Set Virtual Environment (Optional)](#set-virtual-environment-optional)
+  - [Install Required Libraries](#install-required-libraries)
 - [🏃‍♂️ How to Run](#️-how-to-run)
 - [🕹️ Game Play](#️-game-play)
 - [📝 Feedback](#-feedback)
@@ -112,7 +114,6 @@ On the Tic-tac-toe tree, the values represent the utility of the game for the $M
 The minimax algorithm is a powerful tool for decision-making in games, but it has its limitations. The game tree's exponential growth can lead to an impractical number of nodes, rendering the algorithm inefficient. This is where $\alpha-\beta$ pruning comes into play. The alpha-beta pruning algorithm is a technique used to reduce the number of nodes evaluated by the minimax algorithm, enhancing its efficiency. The algorithm employs a cutoff mechanism, which ceases the evaluation of nodes that are no longer relevant to the decision-making process. This is achieved by maintaining two values, alpha and beta, which represent the best value for the $Max$ and $Min$ nodes, respectively. The algorithm then compares the utility of the nodes to these values, and if the utility exceeds the alpha or beta value, the node is pruned.
 
 It is worth noting that even with the alpha-beta pruning, the minimax algorithm is not always the most efficient decision-making tool. Its efficiency is highly dependent on other factors, such as the order of nodes explored and the game's specific logic. Other optimization techniques, such as `killer moves` and `transposition tables`, can further enhance the algorithm's performance. However, it remains a fundamental algorithm for learning and understanding decision-making in games, and a base for more advanced algorithms, such as the `Monte Carlo Tree Search` and `Deep Learning`.
-
 
 A good example of a non-optimal behavior of the minimax algorithm can be demonstrated by the length of the game. In the following example, the algorithm plays 'O', and I play 'X'. The algorithm is going to win, but it is not playing the optimal moves in regarding to game length, thus leading to a longer game.
 
@@ -255,33 +256,65 @@ Included Features:
 
 ## 📋 Prerequisites
 
-Before running the game, ensure you have the following installed:
+### Set Virtual Environment (Optional)
 
-- Python 3.x
-- Tkinter
-- NetworkX
-- Matplotlib
-- PyDot (for tree visualization)
-
-For the Pygame GUI, you will need to install the Pygame library:
+It is recommended to set up a virtual environment to manage the project dependencies. To create a virtual environment, run the following commands:
 
 ```bash
-pip install pygame
+# Create a virtual environment
+python3 -m venv .venv
 ```
+
+Activate the virtual environment:
+
+- **Windows**:
+
+```bash
+.venv\Scripts\activate
+```
+
+- **Linux/macOS**:
+
+```bash
+source .venv/bin/activate
+```
+
+---
+
+### Install Required Libraries
+
+The game requires the following libraries:
+
+- 'pygame' - for the Pygame GUI (see below)
+- 'networkx' - for visualizing the minimax decision tree
+- 'matplotlib' - for plotting the game tree
+- 'numpy' - for numerical operations
+
+Before running the game, install the necessary libraries using the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
+## 🏃‍♂️ How to Run
 
 <p align="center">
     <img src="./images/dark_pro.gif" alt="Pro Game" width="400" />
     <em><br>New Pygame GUI for Tic-tac-toe</em>
 </p>
 
-## 🏃‍♂️ How to Run
-
 1. Clone the repository or download the game file.
 2. Ensure you have all the necessary libraries installed.
 3. Run the script using Python:
 
 ```bash
-python3 main.py
+python3 main.py # for the Tkinter GUI
+```
+
+or
+
+```bash
+python3 threed.py # for the Pygame GUI
 ```
 
 ## 🕹️ Game Play
